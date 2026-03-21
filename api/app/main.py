@@ -1,16 +1,30 @@
-# This is a sample Python script.
+from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from app.controllers.auth_router import auth_router
+from app.settings import Settings
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def start_app():
+    api_app = FastAPI()
+    settings = Settings()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    api_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=['https://api.springboard.numerum.team', 'https://springboard.numerum.team',
+                       'http://localhost:5173', 'http://localhost:3000', 'http://localhost:8000'],
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*'],
+    )
+    api_app.include_router(auth_router, prefix=f'{settings.prefix}/auth', tags=['auth'])
+
+    return api_app
+
+
+app = start_app()
+
+
+@app.get('/', tags=['root'])
+async def root():
+    return {'message': 'Hello :з'}

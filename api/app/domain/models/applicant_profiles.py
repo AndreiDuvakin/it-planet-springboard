@@ -3,6 +3,7 @@ from typing import List
 from sqlalchemy import Text, String, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
+from app.domain.models import ApplicantContact, ApplicantContactRecommendation
 from app.domain.models.base import RootTable
 
 
@@ -32,18 +33,18 @@ class ApplicantProfile(RootTable):
     favorite_companies: Mapped[List['ApplicantFavoriteCompany']] = relationship('ApplicantFavoriteCompany',
                                                                                 back_populates='applicant_profile')
     sent_contacts: Mapped[List['ApplicantContact']] = relationship(
-        'ApplicantContact', back_populates='sender', foreign_keys=['ApplicantContact.sender_id']
+        'ApplicantContact', back_populates='sender', foreign_keys=[ApplicantContact.sender_id]
     )
     received_contacts: Mapped[List['ApplicantContact']] = relationship(
-        'ApplicantContact', back_populates='receiver', foreign_keys=['ApplicantContact.receiver_id']
+        'ApplicantContact', back_populates='receiver', foreign_keys=[ApplicantContact.receiver_id]
     )
     sent_recommendations: Mapped[List['ApplicantContactRecommendation']] = relationship(
         'ApplicantContactRecommendation', back_populates='recommender',
-        foreign_keys=['ApplicantContactRecommendation.recommender_id']
+        foreign_keys=[ApplicantContactRecommendation.recommender_id]
     )
     received_recommendations: Mapped[List['ApplicantContactRecommendation']] = relationship(
         'ApplicantContactRecommendation', back_populates='recipient',
-        foreign_keys=['ApplicantContactRecommendation.recipient_id']
+        foreign_keys=[ApplicantContactRecommendation.recipient_id]
     )
     vacancy_applications: Mapped[List['VacancyApplication']] = relationship('VacancyApplication',
                                                                             back_populates='applicant_profile')
