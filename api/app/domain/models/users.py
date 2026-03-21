@@ -1,8 +1,9 @@
 from datetime import date
 from typing import List
 
-from sqlalchemy import String, Date, ForeignKey
+from sqlalchemy import String, Date, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.domain.models.base import RootTable
 
@@ -17,6 +18,8 @@ class User(RootTable):
     login: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)
     email: Mapped[str] = mapped_column(String(250), unique=True, nullable=True)
     password_hash: Mapped[str] = mapped_column(nullable=False)
+    is_activated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_admin: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     role_id: Mapped[int] = mapped_column(ForeignKey('roles.id'), nullable=False)
 
@@ -24,3 +27,9 @@ class User(RootTable):
     applicant_profile: Mapped['ApplicantProfile'] = relationship('ApplicantProfile', back_populates='user',
                                                                  uselist=False)
     created_companies: Mapped[List['CompanyProfile']] = relationship('CompanyProfile', back_populates='creator')
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)

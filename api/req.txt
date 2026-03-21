@@ -6,3 +6,5 @@ asyncpg==0.31.0
 aiofiles==25.1.0
 uvicorn==0.42.0
 pyjwt==2.12.1
+werkzeug==3.1.6
+pydantic[email]==2.12.5
