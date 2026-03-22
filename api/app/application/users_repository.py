@@ -2,6 +2,7 @@ from typing import Optional, List, Any, Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.domain.models import Role
 from app.domain.models.users import User
@@ -20,6 +21,8 @@ class UsersRepository:
         query = (
             select(User)
             .filter_by(id=user_id)
+            .options(joinedload(User.role))
+            .options(joinedload(User.applicant_profile))
         )
         result = await self.db.execute(query)
         return result.scalars().first()
