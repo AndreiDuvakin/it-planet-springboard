@@ -30,6 +30,13 @@ class RegisterService:
                 detail='Пользователь с таким логином уже существует',
             )
 
+        user = await self.users_repository.get_by_login(create_user_entity.email)
+        if user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Пользователь с такой почтой уже существует',
+            )
+
         if create_user_entity.password != create_user_entity.repeat_password:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -56,14 +63,27 @@ class RegisterService:
             login=create_user_entity.login,
             email=create_user_entity.email,
             birthdate=create_user_entity.birthdate,
-            status_id=default_status.id,
+            role_id=create_user_entity.role_id,
+            is_admin=create_user_entity.is_admin,
         )
-
-        user.role_id = role.id
 
         user.set_password(create_user_entity.password)
 
         user = await self.users_repository.create(user)
+
+        user.role = role
+
+        if role.title == self.user_roles.APPLICANT:
+            applicant_profile = ApplicantProfile(
+                user_id=user.id,
+            )
+            applicant_profile = await self.applicant_profiles_repository.create(applicant_profile)
+
+            user.applicant_profile_id = applicant_profile.id
+            user.applicant_profile = applicant_profile
+
+        else:
+            user.applicant_profile = None
 
         return UserRead.model_validate(user)
 
@@ -72,7 +92,14 @@ class RegisterService:
         if user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail='Пользователь с таким логином или почтой уже существует',
+                detail='Пользователь с таким логином уже существует',
+            )
+
+        user = await self.users_repository.get_by_login(register_user_entity.email)
+        if user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Пользователь с такой почтой уже существует',
             )
 
         if register_user_entity.password != register_user_entity.repeat_password:

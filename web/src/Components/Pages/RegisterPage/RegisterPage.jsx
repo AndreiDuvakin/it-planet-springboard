@@ -104,7 +104,7 @@ export default function RegisterPage() {
                     <Form.Item
                         label="Дата рождения"
                         name="birthdate"
-                        maxdate={dayjs()}
+                        maxDate={dayjs()}
                         rules={[{required: true, message: 'Введите дату рождения'}]}
                     >
                         <DatePicker

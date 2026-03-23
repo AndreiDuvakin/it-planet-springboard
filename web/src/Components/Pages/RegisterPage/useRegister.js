@@ -30,7 +30,7 @@ export default function useRegister() {
         if (user && userData) {
             navigate("/");
         }
-        document.title = "Платформа для поиска работы \"Трамплин\" - Аутентификация";
+        document.title = "Платформа для поиска работы \"Трамплин\" - Регистрация";
     }, [user, userData, navigate]);
 
     const onFinish = async (values) => {

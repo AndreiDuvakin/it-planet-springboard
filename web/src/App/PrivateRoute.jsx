@@ -9,7 +9,7 @@ const PrivateRoute = () => {
         return <LoadingIndicator/>;
     }
 
-    if (!user || !userData || userData.status.title !== "active") {
+    if (!user || !userData || !userData.is_activated ) {
         return <Navigate to="/login"/>;
     }
 

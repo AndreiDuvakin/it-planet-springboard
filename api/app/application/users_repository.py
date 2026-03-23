@@ -1,5 +1,6 @@
 from typing import Optional, List, Any, Sequence
 
+from pydantic import EmailStr
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -13,7 +14,11 @@ class UsersRepository:
         self.db = db
 
     async def get_all(self) -> Sequence[User]:
-        query = select(User)
+        query = (
+            select(User)
+            .options(joinedload(User.role))
+            .options(joinedload(User.applicant_profile))
+        )
         result = await self.db.execute(query)
         return result.scalars().all()
 
@@ -27,7 +32,7 @@ class UsersRepository:
         result = await self.db.execute(query)
         return result.scalars().first()
 
-    async def get_by_login(self, login: str) -> Optional[User]:
+    async def get_by_login(self, login: str | EmailStr) -> Optional[User]:
         query = (
             select(User)
             .filter(or_(User.login == login, User.email == login))

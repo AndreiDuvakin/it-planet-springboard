@@ -29,6 +29,7 @@ class UserCreate(BaseModel):
     password: str = Field(min_length=8)
     repeat_password: str = Field(min_length=8)
     role_id: Optional[int] = None
+    is_admin: bool = False
 
 
 class UserUpdate(BaseModel):
@@ -44,6 +45,11 @@ class UserUpdate(BaseModel):
 class PasswordChangeRequest(BaseModel):
     password: str = Field(min_length=8)
     repeat_password: str = Field(min_length=8)
+
+
+class UserActivate(BaseModel):
+    is_activated: bool
+    user_id: int
 
 
 class UserRead(BaseModel):

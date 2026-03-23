@@ -3,6 +3,7 @@ import {useGetAuthenticatedUserDataQuery} from "../Api/usersApi.js";
 import LoadingIndicator from "../Components/Widgets/LoadingIndicator/LoadingIndicator.jsx";
 import {Result} from "antd";
 import CONFIG from "../Core/сonfig.js";
+import {ROLES} from "../Core/constants.js";
 
 const AdminRoute = () => {
     const {
@@ -25,7 +26,7 @@ const AdminRoute = () => {
         return <Navigate to="/login"/>;
     }
 
-    if (!user.role || user.role.title !== CONFIG.ROOT_ROLE_NAME) {
+    if (user.role?.title !== ROLES.MODERATOR || !user?.is_admin) {
         return <Navigate to="/"/>;
     }
 

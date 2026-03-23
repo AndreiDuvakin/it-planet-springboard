@@ -7,6 +7,13 @@ export const rolesApi = createApi({
     baseQuery: baseQuery,
     tagTypes: ["roles"],
     endpoints: (builder) => ({
+        getAllRoles: builder.query({
+            query: () => ({
+                url: "/roles/",
+                method: "GET",
+            }),
+            providesTags: ["role"],
+        }),
         getAllRolesForRegister: builder.query({
             query: () => "/roles/for-register/",
             providesTags: ["roles"],
@@ -15,5 +22,6 @@ export const rolesApi = createApi({
 });
 
 export const {
+    useGetAllRolesQuery,
     useGetAllRolesForRegisterQuery,
 } = rolesApi;

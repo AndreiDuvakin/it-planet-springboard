@@ -9,7 +9,7 @@ const useAuthUtils = () => {
     const logoutAndRedirect = () => {
         localStorage.removeItem("access_token");
         dispatch(logout());
-        navigate("/login");
+        window.location = "/login";
     };
 
     return { logoutAndRedirect };

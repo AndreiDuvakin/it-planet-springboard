@@ -1,8 +1,9 @@
 import {Badge, Button, Layout, Menu, Space, Tooltip, Typography} from 'antd';
 import {Link, Outlet} from 'react-router-dom';
-import {HomeOutlined, HeartOutlined, UserOutlined} from '@ant-design/icons';
-import useAppLayout from "./useAppLayout.jsx";
+import {HomeOutlined, HeartOutlined, UserOutlined, ControlOutlined} from '@ant-design/icons';
+import useAppLayout from "./useAppLayout.js";
 import LoadingIndicator from "../../Widgets/LoadingIndicator/LoadingIndicator.jsx";
+import {ROLES} from "../../../Core/constants.js";
 
 const {Header, Content, Footer} = Layout;
 
@@ -10,29 +11,31 @@ const AppLayout = () => {
     const {
         user,
         isUserLoading,
-        getItem,
-        selectedKey,
         favoritesCount,
-        cabinetItems,
+        pathname,
+        getItem,
         handleLoginClick,
         handleFavoritesClick,
         handleLogoutClick,
         handleRegisterClick,
+        handleMenuClick,
     } = useAppLayout();
 
     const menuItems = [
-        {key: '/', icon: <HomeOutlined/>, label: <Link to="/">Главная</Link>},
-        {
-            key: 'cabinet',
-            icon: <UserOutlined/>,
-            label: 'Личный кабинет',
-            children: cabinetItems.map((i) => ({
-                key: i.key,
-                icon: i.icon,
-                label: <Link to={i.key}>{i.label}</Link>,
-            })),
-        },
+        getItem("Главная", "/", <HomeOutlined/>),
     ];
+
+    if (user) {
+        menuItems.push(
+            getItem("Личный кабинет", "/cabinet", <UserOutlined/>)
+        )
+    }
+
+    if (user?.is_admin && user?.role?.title === ROLES.MODERATOR) {
+        menuItems.push(
+            getItem("Панель администратора", "/admin", <ControlOutlined/>)
+        )
+    }
 
     return (
         <Layout style={{minHeight: '100svh'}}>
@@ -64,9 +67,10 @@ const AppLayout = () => {
 
                 <Menu
                     mode="horizontal"
-                    selectedKeys={selectedKey ? [selectedKey] : []}
+                    selectedKeys={pathname}
                     style={{flex: 1, minWidth: 0}}
                     items={menuItems}
+                    onClick={handleMenuClick}
                 />
 
                 <Tooltip title="Избранное">

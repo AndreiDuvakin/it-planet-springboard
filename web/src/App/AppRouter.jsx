@@ -5,6 +5,8 @@ import LoginPage from "../Components/Pages/LoginPage/LoginPage.jsx";
 import RegisterPage from "../Components/Pages/RegisterPage/RegisterPage.jsx";
 import HomePage from "../Components/Pages/HomePage/HomePage.jsx";
 import AppLayout from "../Components/Layouts/AppLayout/AppLayout.jsx";
+import CabinetPage from "../Components/Pages/CabinetPage/CabinetPage.jsx";
+import AdminPage from "../Components/Pages/AdminPage/AdminPage.jsx";
 
 
 const AppRouter = () => (
@@ -12,8 +14,12 @@ const AppRouter = () => (
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/register" element={<RegisterPage/>}/>
         <Route element={<AppLayout/>}>
-
             <Route path="/" element={<HomePage/>}/>
+
+            <Route element={<PrivateRoute/>}>
+                <Route path="/cabinet" element={<CabinetPage/>}/>
+            </Route>
+
         </Route>
 
         {/*<Route element={<PrivateRoute/>}>*/}
@@ -26,11 +32,11 @@ const AppRouter = () => (
         {/*    </Route>*/}
         {/*</Route>*/}
 
-        {/*<Route element={<AdminRoute/>}>*/}
-        {/*    <Route element={<MainLayout />}>*/}
-        {/*        <Route path="/admin" element={<AdminPage />} />*/}
-        {/*    </Route>*/}
-        {/*</Route>*/}
+        <Route element={<AdminRoute/>}>
+            <Route element={<AppLayout   />}>
+                <Route path="/admin" element={<AdminPage />} />
+            </Route>
+        </Route>
 
         <Route path={"*"} element={<Navigate to={"/"}/>}/>
     </Routes>

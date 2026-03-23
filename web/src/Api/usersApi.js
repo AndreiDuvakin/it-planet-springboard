@@ -7,9 +7,37 @@ export const usersApi = createApi({
     baseQuery: baseQueryWithAuth,
     tagTypes: ["user"],
     endpoints: (builder) => ({
+        getAllUsers: builder.query({
+            query: () => "/users/",
+            providesTags: ["user"],
+        }),
         getAuthenticatedUserData: builder.query({
             query: () => "/users/me/",
             providesTags: ["user"],
+        }),
+        updateUser: builder.mutation({
+            query: ({userId, ...data}) => ({
+                url: `/users/${userId}/`,
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags: ["user"],
+        }),
+        updateUserPassword: builder.mutation({
+            query: ({userId, ...data}) => ({
+                url: `/users/change-password/${userId}/`,
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["user"],
+        }),
+        createUser: builder.mutation({
+            query: (data) => ({
+                url: "/users/create/",
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["user"],
         }),
         registerUser: builder.mutation({
             query: (data) => ({
@@ -19,10 +47,23 @@ export const usersApi = createApi({
             }),
             invalidatesTags: ["user"],
         }),
+        activateUser: builder.mutation({
+            query: (data) => ({
+                url: "/users/set-activate/",
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["user"],
+        })
     }),
 });
 
 export const {
+    useGetAllUsersQuery,
     useGetAuthenticatedUserDataQuery,
+    useUpdateUserMutation,
+    useUpdateUserPasswordMutation,
+    useCreateUserMutation,
     useRegisterUserMutation,
+    useActivateUserMutation,
 } = usersApi;
