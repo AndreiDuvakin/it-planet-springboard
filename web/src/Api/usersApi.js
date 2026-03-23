@@ -11,9 +11,18 @@ export const usersApi = createApi({
             query: () => "/users/me/",
             providesTags: ["user"],
         }),
+        registerUser: builder.mutation({
+            query: (data) => ({
+                url: "/users/register/",
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["user"],
+        }),
     }),
 });
 
 export const {
     useGetAuthenticatedUserDataQuery,
+    useRegisterUserMutation,
 } = usersApi;

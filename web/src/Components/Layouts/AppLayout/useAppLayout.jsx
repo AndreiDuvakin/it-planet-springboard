@@ -41,6 +41,7 @@ const useAppLayout = () => {
     const handleLogoClick = () => navigate('/');
     const handleLoginClick = () => navigate('/login');
     const handleFavoritesClick = () => navigate('/favorites');
+    const handleRegisterClick = () => navigate('/register');
 
     return {
         user,
@@ -53,6 +54,7 @@ const useAppLayout = () => {
         handleLoginClick,
         handleFavoritesClick,
         handleLogoutClick,
+        handleRegisterClick,
     };
 };
 

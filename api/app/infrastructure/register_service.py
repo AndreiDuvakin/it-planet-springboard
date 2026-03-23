@@ -72,7 +72,7 @@ class RegisterService:
         if user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail='Пользователь с таким логином уже существует',
+                detail='Пользователь с таким логином или почтой уже существует',
             )
 
         if register_user_entity.password != register_user_entity.repeat_password:
@@ -113,6 +113,7 @@ class RegisterService:
         user.set_password(register_user_entity.password)
 
         user = await self.users_repository.create(user)
+        user.role = role
 
         if role.title == self.user_roles.APPLICANT:
             applicant_profile = ApplicantProfile(
@@ -123,7 +124,10 @@ class RegisterService:
             user.applicant_profile_id = applicant_profile.id
             user.applicant_profile = applicant_profile
 
-        return await UserRead.model_validate(user)
+        else:
+            user.applicant_profile = None
+
+        return UserRead.model_validate(user)
 
     @staticmethod
     def is_strong_password(password: str) -> bool:

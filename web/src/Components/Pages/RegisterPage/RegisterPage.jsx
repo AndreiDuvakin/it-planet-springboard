@@ -22,16 +22,18 @@ import {
 } from '@ant-design/icons';
 import AppLogoBlock from "../../Widgets/AppLogoBlock/AppLogoBlock.jsx";
 import useRegister from "./useRegister.js";
+import dayjs from "dayjs";
 
 const {Title, Text} = Typography;
 
 export default function RegisterPage() {
     const {
         form,
-        role,
+        defaultRoleValue,
+        isLoading,
+        radioOptions,
         onFinish,
         goToLogin,
-        validateConfirmPassword
     } = useRegister();
 
     return (
@@ -48,24 +50,22 @@ export default function RegisterPage() {
                     name="register"
                     onFinish={onFinish}
                     layout="vertical"
-                    initialValues={{role: 'candidate'}}
                 >
                     <Form.Item
                         label="Роль на платформе"
-                        name="role"
+                        name="role_id"
                         rules={[{required: true, message: 'Выберите роль'}]}
                     >
-                        <Radio.Group>
-                            <Radio value="candidate">Соискатель</Radio>
-                            <Radio value="employer">Работодатель</Radio>
-                        </Radio.Group>
+                        <Radio.Group
+                            options={radioOptions}
+                        />
                     </Form.Item>
 
                     <Row gutter={16}>
                         <Col span={12}>
                             <Form.Item
                                 label="Имя"
-                                name="firstName"
+                                name="first_name"
                                 rules={[{required: true, message: 'Введите имя'}]}
                             >
                                 <Input prefix={<UserOutlined/>} placeholder="Иван" size="large"/>
@@ -74,7 +74,7 @@ export default function RegisterPage() {
                         <Col span={12}>
                             <Form.Item
                                 label="Фамилия"
-                                name="lastName"
+                                name="last_name"
                                 rules={[{required: true, message: 'Введите фамилию'}]}
                             >
                                 <Input prefix={<UserOutlined/>} placeholder="Иванов" size="large"/>
@@ -97,9 +97,14 @@ export default function RegisterPage() {
                         <Input prefix={<MailOutlined/>} placeholder="example@mail.com" size="large"/>
                     </Form.Item>
 
+                    <Form.Item label="Логин" name="login" rules={[{required: true, message: "Введите логин"}]}>
+                        <Input/>
+                    </Form.Item>
+
                     <Form.Item
                         label="Дата рождения"
-                        name="birthday"
+                        name="birthdate"
+                        maxdate={dayjs()}
                         rules={[{required: true, message: 'Введите дату рождения'}]}
                     >
                         <DatePicker
@@ -137,10 +142,14 @@ export default function RegisterPage() {
                         label="Подтверждение пароля"
                         name="repeat_password"
                         dependencies={['password']}
-                        rules={[
-                            {required: true, message: 'Подтвердите пароль'},
-                            validateConfirmPassword
-                        ]}
+                        rules={[{required: true, message: "Подтвердите пароль"}, ({getFieldValue}) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue("password") === value) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error("Пароли не совпадают"));
+                            },
+                        }),]}
                     >
                         <Input.Password
                             prefix={<LockOutlined/>}
@@ -149,40 +158,8 @@ export default function RegisterPage() {
                         />
                     </Form.Item>
 
-                    {role === 'employer' && (
-                        <Card size="small" title="Верификация компании"
-                              style={{marginTop: 8, marginBottom: 12, backgroundColor: '#fafafa'}}>
-                            <Space direction="vertical" size={12} style={{width: '100%'}}>
-                                <Form.Item
-                                    label="Название компании"
-                                    name="companyName"
-                                    rules={[{required: true, message: 'Введите название'}]}
-                                >
-                                    <Input placeholder="ООО «КодИнсайт»"/>
-                                </Form.Item>
-                                <Form.Item
-                                    label="ИНН"
-                                    name="inn"
-                                    rules={[
-                                        {required: true, message: 'Введите ИНН'},
-                                        {pattern: /^\d{10}(\d{2})?$/, message: 'ИНН: 10 или 12 цифр'},
-                                    ]}
-                                >
-                                    <Input placeholder="7707083893"/>
-                                </Form.Item>
-                                <Form.Item label="Корпоративная почта" name="corpEmail"
-                                           rules={[{type: 'email', message: 'Некорректный email'}]}>
-                                    <Input placeholder="hr@company.ru"/>
-                                </Form.Item>
-                                <Form.Item label="Сайт компании" name="companyLink">
-                                    <Input placeholder="https://company.ru"/>
-                                </Form.Item>
-                            </Space>
-                        </Card>
-                    )}
-
-                    <Space direction="vertical" size={10} style={{width: '100%', marginTop: 12}}>
-                        <Button type="primary" htmlType="submit" block size="large">
+                    <Space orientation="vertical" size={10} style={{width: '100%', marginTop: 12}}>
+                        <Button type="primary" htmlType="submit" block size="large" loading={isLoading}>
                             Зарегистрироваться
                         </Button>
                         <Button block onClick={goToLogin}>

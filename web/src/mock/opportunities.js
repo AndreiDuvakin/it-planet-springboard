@@ -1,3 +1,5 @@
+// TODO убрать файл с константами
+
 export const OPPORTUNITY_TYPES = [
     { value: 'internship', label: 'Стажировка' },
     { value: 'vacancy_junior', label: 'Вакансия (стажёрская/Junior)' },

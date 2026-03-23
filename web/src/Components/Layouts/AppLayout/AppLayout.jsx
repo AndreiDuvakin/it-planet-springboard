@@ -17,6 +17,7 @@ const AppLayout = () => {
         handleLoginClick,
         handleFavoritesClick,
         handleLogoutClick,
+        handleRegisterClick,
     } = useAppLayout();
 
     const menuItems = [
@@ -93,9 +94,16 @@ const AppLayout = () => {
                     </Space>
                 ) : (
 
-                    <Button type="primary" onClick={handleLoginClick}>
-                        Вход
-                    </Button>
+                    <Space
+                        orientation={"horizontal"}
+                    >
+                        <Button type="primary" onClick={handleLoginClick}>
+                            Вход
+                        </Button>
+                        <Button type="default" onClick={handleRegisterClick}>
+                            Регистрация
+                        </Button>
+                    </Space>
                 )}
             </Header>
 

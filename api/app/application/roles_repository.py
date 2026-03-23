@@ -3,6 +3,7 @@ from typing import Optional, Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.constants import UserRoles
 from app.domain.models.roles import Role
 
 
@@ -12,6 +13,14 @@ class RolesRepository:
 
     async def get_all(self) -> Sequence[Role]:
         query = select(Role)
+        result = await self.db.execute(query)
+        return result.scalars().all()
+
+    async def get_for_register(self) -> Sequence[Role]:
+        query = (
+            select(Role)
+            .filter(Role.title != UserRoles.MODERATOR)
+        )
         result = await self.db.execute(query)
         return result.scalars().all()
 

@@ -1,3 +1,4 @@
+// TODO убрать константу
 const STORAGE_KEY = 'tramplin_favorites_v1'
 
 export function getFavoriteIds() {

@@ -16,7 +16,7 @@ class UserRegister(BaseModel):
     birthdate: date
     password: str = Field(min_length=8)
     repeat_password: str = Field(min_length=8)
-    role_id: int = Field()
+    role_id: int
 
 
 class UserCreate(BaseModel):
