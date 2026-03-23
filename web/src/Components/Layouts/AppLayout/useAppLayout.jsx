@@ -2,6 +2,8 @@ import {useMemo} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {getFavoriteIds} from "../../Pages/FavoritesPage/favorites.js";
 import {UserOutlined} from "@ant-design/icons";
+import useAuthUtils from "../../../Hook/useAuthUtils.js";
+import {useSelector} from "react-redux";
 
 const CABINET_ITEMS = [
     {key: '/cabinet/candidate', label: 'Соискатель', icon: <UserOutlined/>},
@@ -12,6 +14,15 @@ const CABINET_ITEMS = [
 const useAppLayout = () => {
     const {pathname} = useLocation();
     const navigate = useNavigate();
+    const {logoutAndRedirect} = useAuthUtils();
+
+    const {userData: user, isLoading: isUserLoading, error: isUserError} = useSelector((state) => state.auth);
+    const getItem = (label, key, icon, children) => ({key, icon, children, label});
+
+    const handleLogoutClick = ({key}) => {
+        logoutAndRedirect();
+        navigate(key);
+    };
 
     const selectedKey = useMemo(() => {
         const known = [
@@ -32,12 +43,16 @@ const useAppLayout = () => {
     const handleFavoritesClick = () => navigate('/favorites');
 
     return {
+        user,
+        isUserLoading,
+        getItem,
         selectedKey,
         favoritesCount,
         cabinetItems: CABINET_ITEMS,
         handleLogoClick,
         handleLoginClick,
         handleFavoritesClick,
+        handleLogoutClick,
     };
 };
 

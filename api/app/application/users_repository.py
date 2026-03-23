@@ -1,6 +1,6 @@
 from typing import Optional, List, Any, Sequence
 
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -30,7 +30,7 @@ class UsersRepository:
     async def get_by_login(self, login: str) -> Optional[User]:
         query = (
             select(User)
-            .filter_by(login=login)
+            .filter(or_(User.login == login, User.email == login))
         )
         result = await self.db.execute(query)
         return result.scalars().first()

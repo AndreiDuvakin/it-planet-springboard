@@ -38,11 +38,11 @@ export default function LoginPage() {
                     onFinish={onFinish}
                 >
                     <Form.Item
-                        label="Email"
+                        label="Логин"
                         name="login"
                         rules={[
-                            {required: true, message: 'Введите email'},
-                            {type: 'email', message: 'Введите корректный email'}
+                            {required: true, message: 'Введите логин или email'},
+                            {type: 'string', message: 'Введите корректный логин или email'}
                         ]}
                     >
                         <Input prefix={<MailOutlined/>} placeholder="example@mail.com" size="large"/>

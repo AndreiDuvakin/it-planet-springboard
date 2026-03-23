@@ -1,6 +1,7 @@
 import {fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {logout} from '../Redux/Slices/authSlice.js';
 import CONFIG from "../Core/сonfig.js";
+import {notification} from "antd";
 
 export const baseQuery = fetchBaseQuery({
     baseUrl: CONFIG.BASE_URL,
@@ -24,7 +25,7 @@ export const baseQuery = fetchBaseQuery({
 
 export const baseQueryWithAuth = async (args, api, extraOptions) => {
     const result = await baseQuery(args, api, extraOptions);
-    if (result.error && [401, 403].includes(result.error.status)) {
+    if (result.error && [401, 403].includes(result.error.status) && !args.url.includes('auth')) {
         localStorage.removeItem('access_token');
         api.dispatch(logout());
         window.location.href = '/login';
