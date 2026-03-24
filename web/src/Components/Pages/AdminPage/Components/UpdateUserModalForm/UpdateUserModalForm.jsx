@@ -25,6 +25,7 @@ import {
 import dayjs from "dayjs";
 import LoadingIndicator from "../../../../Widgets/LoadingIndicator/LoadingIndicator.jsx";
 import useUpdateUserModalForm from "./useUpdateUserModalForm.js";
+import {ROLES_MAP} from "../../../../../Core/constants.js";
 
 const {Title, Text} = Typography;
 
@@ -135,15 +136,14 @@ const UpdateUserModalForm = () => {
                                 <Col xs={24} md={12}>
                                     <Form.Item
                                         name="role_id"
-                                        label={<><CrownOutlined/> Роль</>}
+                                        label={"Роль"}
                                         rules={[{required: true, message: "Выберите роль"}]}
                                     >
                                         <Select disabled size="large" placeholder="Выберите роль">
                                             {roles.map((role) => (
                                                 <Select.Option key={role.id} value={role.id}>
                                                     <Space>
-                                                        <CrownOutlined style={{color: "#722ed1"}}/>
-                                                        {role.title}
+                                                        {ROLES_MAP[role.title]}
                                                     </Space>
                                                 </Select.Option>
                                             ))}
