@@ -8,7 +8,6 @@ from app.application.applicant_profiles_repository import ApplicantProfilesRepos
 from app.application.universities_repository import UniversitiesRepository
 from app.core.constants import UserRoles
 from app.domain.entities.applicant_educations import ApplicantEducationRead, ApplicantEducationCreate
-from app.domain.entities.universities import UniversityRead
 from app.domain.models import User, ApplicantEducation
 
 
@@ -43,7 +42,8 @@ class ApplicantEducationsService:
         return response
 
     async def replace_applicant_educations(
-            self, applicant_educations: List[ApplicantEducationCreate],
+            self,
+            applicant_educations: List[ApplicantEducationCreate],
             applicant_id: int,
             current_user: User,
     ) -> List[ApplicantEducationRead]:
@@ -60,6 +60,7 @@ class ApplicantEducationsService:
 
         old_applicant_educations = await self.applicant_educations_repository.get_by_applicant_id(applicant_id)
         await self.applicant_educations_repository.delete_list(old_applicant_educations)
+
         applicant_education_models = []
         for applicant_education in applicant_educations:
             university = await self.universities_repository.get_by_id(applicant_education.university_id)

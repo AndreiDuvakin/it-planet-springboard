@@ -24,11 +24,13 @@ const {Text} = Typography;
 function ProfileTab({initialData, onRefresh}) {
     const {
         form,
+        isSaving,
         handleSave,
         editorRef,
         joditConfig,
         universitiesOptions,
-        isSaving,
+        applicantSkillTagsOptions,
+        experienceLevelsOptions,
     } = useProfileTab(initialData, onRefresh);
 
     return (
@@ -171,7 +173,8 @@ function ProfileTab({initialData, onRefresh}) {
                                                 </Form.Item>
                                             </Col>
                                             <Col xs={12} md={6}>
-                                                <Form.Item {...restField} name={[name, 'end_education_year']} label="Год выпуска">
+                                                <Form.Item {...restField} name={[name, 'end_education_year']}
+                                                           label="Год выпуска">
                                                     <InputNumber size="large" placeholder="ГГГГ"/>
                                                 </Form.Item>
                                             </Col>
@@ -184,7 +187,7 @@ function ProfileTab({initialData, onRefresh}) {
                                                     valuePropName="checked"
                                                     style={{marginBottom: 0}}
                                                 >
-                                                    <Switch size="small" />
+                                                    <Switch size="small"/>
                                                 </Form.Item>
                                             </Col>
                                             <Col>
@@ -210,23 +213,36 @@ function ProfileTab({initialData, onRefresh}) {
                                 {fields.map(({key, name, ...restField}) => (
                                     <Row key={key} gutter={24} align="bottom" style={{marginBottom: 16}}>
                                         <Col flex="auto">
-                                            <Form.Item {...restField} name={[name, 'tag']}
-                                                       label={name === 0 ? "Навык" : ""} style={{marginBottom: 0}}>
+                                            <Form.Item
+                                                {...restField}
+                                                name={[name, 'tag_id']}
+                                                label={name === 0 ? "Навык" : ""}
+                                                style={{marginBottom: 0}}
+                                                rules={[{required: true}]}
+                                            >
                                                 <Select
-                                                    showSearch
                                                     size="large"
                                                     placeholder="Выберите навык"
-                                                    options={initialData?.dictionaries?.skills || []}
+                                                    options={applicantSkillTagsOptions}
+                                                    showSearch={{
+                                                        filterOption: (input, option) =>
+                                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
+                                                    }}
                                                 />
                                             </Form.Item>
                                         </Col>
                                         <Col xs={24} md={8}>
-                                            <Form.Item {...restField} name={[name, 'level']}
-                                                       label={name === 0 ? "Уровень" : ""} style={{marginBottom: 0}}>
+                                            <Form.Item
+                                                {...restField}
+                                                name={[name, 'level_id']}
+                                                label={name === 0 ? "Уровень" : ""}
+                                                style={{marginBottom: 0}}
+                                                rules={[{required: true}]}
+                                            >
                                                 <Select
                                                     size="large"
                                                     placeholder="Ваш уровень"
-                                                    options={initialData?.dictionaries?.skillLevels || []}
+                                                    options={experienceLevelsOptions || []}
                                                 />
                                             </Form.Item>
                                         </Col>
@@ -249,10 +265,10 @@ function ProfileTab({initialData, onRefresh}) {
                         name="resume_url"
                         label="Ссылка на внешнее резюме"
                         rules={[
-                            { type: "url", message: "Введите корректный URL" },
+                            {type: "url", message: "Введите корректный URL"},
                         ]}
                     >
-                        <Input placeholder="https://example.com" />
+                        <Input placeholder="https://example.com"/>
                     </Form.Item>
 
                     <div style={{marginBottom: 32, border: "1px solid #d9d9d9", borderRadius: 8, overflow: 'hidden'}}>

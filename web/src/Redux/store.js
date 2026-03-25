@@ -7,6 +7,9 @@ import {rolesApi} from "../Api/rolesApi.js";
 import {universitiesApi} from "../Api/universitiesApi.js";
 import {applicantEducationsApi} from "../Api/applicantEducationsApi.js";
 import {applicantProfilesApi} from "../Api/applicantProfilesApi.js";
+import {applicantSkillsApi} from "../Api/applicantSkillsApi.js";
+import {applicantSkillTagsApi} from "../Api/applicantSkillTagsApi.js";
+import {experienceLevelsApi} from "../Api/experienceLevelsApi.js";
 
 export const store = configureStore({
     reducer: {
@@ -23,6 +26,12 @@ export const store = configureStore({
         [applicantEducationsApi.reducerPath]: applicantEducationsApi.reducer,
 
         [applicantProfilesApi.reducerPath]: applicantProfilesApi.reducer,
+
+        [applicantSkillsApi.reducerPath]: applicantSkillsApi.reducer,
+
+        [applicantSkillTagsApi.reducerPath]: applicantSkillTagsApi.reducer,
+
+        [experienceLevelsApi.reducerPath]: experienceLevelsApi.reducer,
     },
     middleware: (getDefaultMiddleware) => (
         getDefaultMiddleware().concat(
@@ -32,6 +41,9 @@ export const store = configureStore({
             universitiesApi.middleware,
             applicantEducationsApi.middleware,
             applicantProfilesApi.middleware,
+            applicantSkillsApi.middleware,
+            applicantSkillTagsApi.middleware,
+            experienceLevelsApi.middleware,
         )
     ),
 });

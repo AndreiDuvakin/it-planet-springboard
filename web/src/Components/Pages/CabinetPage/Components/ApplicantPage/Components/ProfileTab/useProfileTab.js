@@ -10,6 +10,12 @@ import {
 } from "../../../../../../../Api/applicantEducationsApi.js";
 import {useUpdateUserMutation} from "../../../../../../../Api/usersApi.js";
 import {useUpdateApplicantProfileMutation} from "../../../../../../../Api/applicantProfilesApi.js";
+import {
+    useGetApplicantSkillsByApplicantIdQuery,
+    useReplaceApplicantSkillsMutation
+} from "../../../../../../../Api/applicantSkillsApi.js";
+import {useGetAllApplicantSkillTagsQuery} from "../../../../../../../Api/applicantSkillTagsApi.js";
+import {useGetAllExperienceLevelsQuery} from "../../../../../../../Api/experienceLevelsApi.js";
 
 const useProfileTab = () => {
     const [form] = Form.useForm();
@@ -21,14 +27,30 @@ const useProfileTab = () => {
     } = useGetAllUniversitiesQuery();
 
     const {
+        data: skillTags = [],
+    } = useGetAllApplicantSkillTagsQuery();
+
+    const {
+        data: experienceLevels = [],
+    } = useGetAllExperienceLevelsQuery();
+
+    const {
         data: educationsData = [],
         isLoading: educationsLoading,
     } = useGetApplicantEducationsByApplicantIdQuery(userData?.applicant_profile?.id, {
         skip: !userData?.applicant_profile?.id,
     });
 
+    const {
+        data: skillsData = [],
+        isLoading: skillsLoading,
+    } = useGetApplicantSkillsByApplicantIdQuery(userData?.applicant_profile?.id, {
+        skip: !userData?.applicant_profile?.id,
+    })
+
     const [updateUser, {isLoading: updatingUser}] = useUpdateUserMutation();
     const [replaceEducations, {isLoading: updatingEducations}] = useReplaceApplicantEducationsMutation();
+    const [replaceSkills, {isLoading: updatingSkills}] = useReplaceApplicantSkillsMutation();
     const [updateApplicantProfile, {isLoading: updatingApplicantProfile}] = useUpdateApplicantProfileMutation();
 
     useEffect(() => {
@@ -47,6 +69,11 @@ const useProfileTab = () => {
                 is_in_the_learning: edu.is_in_the_learning,
             }));
 
+            values.skills = skillsData.map((skill) => ({
+                level_id: skill.level_id,
+                tag_id: skill.tag_id,
+            }))
+
             form.setFieldsValue(values);
 
             if (userData.applicant_profile) {
@@ -58,7 +85,7 @@ const useProfileTab = () => {
                 }
             }
         }
-    }, [userData, educationsData, form, setContent]);
+    }, [userData, educationsData, form, setContent, skillsData]);
 
     const handleSave = async (values) => {
         try {
@@ -76,14 +103,17 @@ const useProfileTab = () => {
             const applicantProfilePayload = {
                 resume_url: values.resume_url,
                 resume_html: getContent(),
-            }
+            };
 
             const educationsPayload = values.educations || [];
+
+            const skillsPayload = values.skills || [];
 
             await Promise.all([
                 updateUser({userId, ...userPayload}).unwrap(),
                 replaceEducations({applicantId: applicantId, applicantEducations: educationsPayload}).unwrap(),
                 updateApplicantProfile({applicantId: applicantId, ...applicantProfilePayload}).unwrap(),
+                replaceSkills({applicantId: applicantId, applicantSkills: skillsPayload}).unwrap(),
             ]);
 
             notification.success({
@@ -103,15 +133,27 @@ const useProfileTab = () => {
     const universitiesOptions = universities.map((item) => ({
         value: item.id,
         label: item.title,
+    }));
+
+    const applicantSkillTagsOptions = skillTags.map((item) => ({
+        value: item.id,
+        label: item.title,
+    }));
+
+    const experienceLevelsOptions = experienceLevels.map((item) => ({
+        value: item.id,
+        label: item.title,
     }))
 
     return {
         form,
-        isSaving: updatingUser || updatingEducations || updatingApplicantProfile || educationsLoading,
+        isSaving: updatingUser || updatingEducations || updatingApplicantProfile || educationsLoading || skillsLoading || updatingSkills,
         handleSave,
         editorRef,
         joditConfig,
         universitiesOptions,
+        applicantSkillTagsOptions,
+        experienceLevelsOptions,
     };
 };
 

@@ -19,7 +19,7 @@ class CompanyProfile(RootTable):
 
     logo_id: Mapped[int] = mapped_column(ForeignKey('company_profile_logos.id'), nullable=True)
     official_photo_id: Mapped[int] = mapped_column(ForeignKey('company_profile_photos.id'),
-                                                   nullable=True)  # fixed spelling
+                                                   nullable=True)
     creator_user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     industry_id: Mapped[int] = mapped_column(ForeignKey('industries.id'), nullable=False)
 
