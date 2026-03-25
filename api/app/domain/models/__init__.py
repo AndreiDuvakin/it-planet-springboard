@@ -20,7 +20,6 @@ from app.domain.models.applicant_profiles import ApplicantProfile
 from app.domain.models.applicant_resume_files import ApplicantResumeFile
 from app.domain.models.applicant_resume_links import ApplicantResumeLink
 from app.domain.models.applicant_resume_projects import ApplicantResumeProject
-from app.domain.models.applicant_skill_tag_categories import ApplicantSkillTagCategory
 from app.domain.models.applicant_skill_tags import ApplicantSkillTag
 from app.domain.models.applicant_skills import ApplicantSkill
 from app.domain.models.career_events import CareerEvent

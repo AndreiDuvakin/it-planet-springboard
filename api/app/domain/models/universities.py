@@ -11,5 +11,4 @@ class University(RootTable):
 
     title: Mapped[str] = mapped_column(String(300), nullable=False)
 
-    applicant_profiles: Mapped[List['ApplicantProfile']] = relationship('ApplicantProfile', back_populates='university')
     educations: Mapped[List['ApplicantEducation']] = relationship('ApplicantEducation', back_populates='university')

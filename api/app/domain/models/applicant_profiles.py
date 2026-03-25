@@ -13,11 +13,9 @@ class ApplicantProfile(RootTable):
     resume_html: Mapped[str] = mapped_column(Text, nullable=True)
     resume_url: Mapped[str] = mapped_column(String(500), nullable=True)
 
-    university_id: Mapped[int] = mapped_column(ForeignKey('universities.id'), nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 
     user: Mapped['User'] = relationship('User', back_populates='applicant_profile', uselist=False)
-    university: Mapped['University'] = relationship('University', back_populates='applicant_profiles')
 
     educations: Mapped[List['ApplicantEducation']] = relationship('ApplicantEducation',
                                                                   back_populates='applicant_profile')
