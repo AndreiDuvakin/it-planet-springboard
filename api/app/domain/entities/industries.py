@@ -1,18 +1,15 @@
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field
 
-
-class ApplicantSkillTagCreate(BaseModel):
+class IndustryCreate(BaseModel):
     title: str = Field(max_length=150)
-    category_id: int
 
 
-class ApplicantSkillTagUpdate(BaseModel):
+class IndustryUpdate(BaseModel):
     title: Optional[str] = Field(default=None, max_length=150)
-    category_id: Optional[int] = None
 
 
-class ApplicantSkillTagRead(BaseModel):
+class IndustryRead(BaseModel):
     id: int
     title: str
 

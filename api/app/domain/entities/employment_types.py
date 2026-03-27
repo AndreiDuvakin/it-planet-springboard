@@ -1,15 +1,16 @@
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field
 
-class ExperienceLevelCreate(BaseModel):
+
+class EmploymentTypeCreate(BaseModel):
     title: str = Field(max_length=100)
 
 
-class ExperienceLevelUpdate(BaseModel):
+class EmploymentTypeUpdate(BaseModel):
     title: Optional[str] = Field(default=None, max_length=100)
 
 
-class ExperienceLevelRead(BaseModel):
+class EmploymentTypeRead(BaseModel):
     id: int
     title: str
 
