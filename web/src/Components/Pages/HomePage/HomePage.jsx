@@ -22,7 +22,6 @@ import {
 } from '@ant-design/icons'
 import {
     OPPORTUNITY_TYPES,
-    TAGS,
     WORK_FORMATS,
 } from '../../../mock/opportunities.js'
 import {
@@ -60,6 +59,7 @@ export default function HomePage() {
         mapSrc,
         onSelectMapItem,
         onToggleFavorite,
+        allSkillTags,
     } = useHomePage()
 
     return (
@@ -143,8 +143,12 @@ export default function HomePage() {
                                 placeholder="Навыки / теги"
                                 value={tags}
                                 onChange={setTags}
-                                options={TAGS.map((t) => ({value: t, label: t}))}
+                                options={allSkillTags.map((t) => ({value: t.id, label: t.title}))}
                                 style={{width: '100%'}}
+                                showSearch={{
+                                    filterOption: (input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
+                                }}
                                 allowClear
                             />
                             <div>

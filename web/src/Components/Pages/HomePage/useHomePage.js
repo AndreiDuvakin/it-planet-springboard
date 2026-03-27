@@ -3,6 +3,7 @@ import {notification} from 'antd'
 import {useNavigate} from 'react-router-dom'
 import {OPPORTUNITIES, OPPORTUNITY_TYPES, WORK_FORMATS} from '../../../mock/opportunities.js'
 import {getFavoriteIds, toggleFavorite} from '../FavoritesPage/favorites.js'
+import {useGetAllApplicantSkillTagsQuery} from "../../../Api/applicantSkillTagsApi.js";
 
 export const EMPLOYMENT_TYPES = [
     {value: 'full', label: 'Полная занятость'},
@@ -59,6 +60,12 @@ export function useHomePage() {
     const openNotification = useCallback((msg) => {
         api.success({message: msg, placement: 'topRight', duration: 2})
     }, [api])
+
+    const {
+        data: allSkillTags = []
+    } = useGetAllApplicantSkillTagsQuery(undefined, {
+        poolingInterval: 10000,
+    });
 
     const filtered = useMemo(() => {
         const s = search.trim().toLowerCase()
@@ -118,5 +125,6 @@ export function useHomePage() {
         mapSrc,
         onSelectMapItem,
         onToggleFavorite,
+        allSkillTags,
     }
 }
