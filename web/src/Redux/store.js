@@ -10,13 +10,6 @@ import {applicantProfilesApi} from "../Api/applicantProfilesApi.js";
 import {applicantSkillsApi} from "../Api/applicantSkillsApi.js";
 import {applicantSkillTagsApi} from "../Api/applicantSkillTagsApi.js";
 import {experienceLevelsApi} from "../Api/experienceLevelsApi.js";
-import { authApi } from "../Api/authApi.js";
-import { usersApi } from "../Api/usersApi.js";
-import { rolesApi } from "../Api/rolesApi.js";
-import { universitiesApi } from "../Api/universitiesApi.js";
-import { applicantEducationsApi } from "../Api/applicantEducationsApi.js";
-import { applicantProfilesApi } from "../Api/applicantProfilesApi.js";
-
 // Добавляем новые API
 import { companyApi } from "../Api/companyApi.js";
 import { industriesApi } from "../Api/industriesApi.js";
@@ -63,7 +56,7 @@ export const store = configureStore({
             industriesApi.middleware,
             vacanciesApi.middleware,
             dictionariesApi.middleware,
-            internshipsApi.middleware // ДОБАВИТЬ ЭТО
+            internshipsApi.middleware, // ДОБАВИТЬ ЭТО
             applicantSkillsApi.middleware,
             applicantSkillTagsApi.middleware,
             experienceLevelsApi.middleware,

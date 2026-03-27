@@ -9,27 +9,18 @@ from app.domain.entities.location_coordinates import LocationCoordinateRead
 
 
 class InternshipCreate(BaseModel):
-    title: str = Field(max_length=250)
-    description: Optional[str] = None
-    media_url: Optional[str] = Field(default=None, max_length=500)
-    address: Optional[str] = Field(default=None, max_length=500)
-
-    # Делаем эти поля необязательными для фронтенда
-    published_at: Optional[datetime] = None
-    company_id: Optional[int] = None
-    moderation_status_id: Optional[int] = None
-    location_id: Optional[int] = None
-
-    is_active: bool = True
-    moderation_comment: Optional[str] = None
+    title: str
+    description: str
+    address: str
     duration_months: int
-    is_paid: bool = False
-    mentorship_available: bool = False
-    expires_at: Optional[datetime] = None
-
     experience_level_id: int
     work_format_id: int
-
+    # Эти поля делаем Optional, их заполнит сервис
+    expires_at: Optional[datetime] = None
+    media_url: Optional[str] = None
+    is_paid: bool = False
+    mentorship_available: bool = False
+    tag_ids: List[int] = []
 
 class InternshipUpdate(BaseModel):
     title: Optional[str] = Field(default=None, max_length=250)

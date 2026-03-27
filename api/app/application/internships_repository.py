@@ -1,4 +1,3 @@
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -18,20 +17,16 @@ class InternshipsRepository:
         self.db.add(internship)
         await self.db.commit()
 
-        # Глубокая подгрузка всех связей для InternshipRead
         query = (
             select(Internship)
             .filter_by(id=internship.id)
             .options(
                 joinedload(Internship.work_format),
                 joinedload(Internship.experience_level),
-                joinedload(Internship.moderation_status),
                 joinedload(Internship.location),
                 joinedload(Internship.company_profile).options(
                     joinedload(CompanyProfile.logo),
-                    joinedload(CompanyProfile.official_photo),
-                    joinedload(CompanyProfile.industry),
-                    joinedload(CompanyProfile.socials)
+                    joinedload(CompanyProfile.industry)
                 )
             )
         )
