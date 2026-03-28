@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import RedirectResponse
 
 from app.controllers.applicant_educations_router import applicant_education_router
 from app.controllers.applicant_profiles_router import applicant_profiles_router
@@ -57,4 +58,4 @@ app = start_app()
 
 @app.get('/', tags=['root'])
 async def root():
-    return {'message': 'Hello :з'}
+    return RedirectResponse(url='/docs')

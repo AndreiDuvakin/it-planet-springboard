@@ -1,15 +1,59 @@
 import React from 'react';
-import { Form, Input, Button, Row, Col, Select, Divider, Upload, Skeleton } from 'antd';
+import { Form, Input, Button, Row, Col, Select, Divider, Upload, Skeleton, Alert, Space, Typography } from 'antd';
 import { PlusOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import useCompanyTab from './useCompanyTab';
 
 const CompanyTab = ({ notify }) => {
-    const { form, isLoading, isSaving, handleSave, dictionaries } = useCompanyTab(notify);
+    const {
+        form,
+        verForm,
+        isLoading,
+        isSaving,
+        handleSave,
+        dictionaries,
+        verificationStatus,
+        submitVerification,
+        markVerifiedDemo,
+        companyTitle,
+    } = useCompanyTab();
 
     if (isLoading) return <Skeleton active />;
 
     return (
-        <Form layout="vertical" form={form} onFinish={handleSave}>
+        <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+            <Alert
+                type={verificationStatus === 'approved' ? 'success' : verificationStatus === 'pending' ? 'warning' : 'info'}
+                showIcon
+                message={`Верификация компании: ${verificationStatus === 'approved' ? 'подтверждена' : verificationStatus === 'pending' ? 'на проверке' : verificationStatus === 'rejected' ? 'отклонена' : 'не пройдена'}`}
+                description="Для публикации вакансий и стажировок через API нужна верификация. Мероприятия и менторство можно добавлять локально без API."
+            />
+            <Form layout="vertical" form={verForm} onFinish={submitVerification}>
+                <Typography.Title level={5} style={{ marginTop: 0 }}>Заявка на верификацию</Typography.Title>
+                <Form.Item label="Компания" name="company_name" initialValue={companyTitle} rules={[{ required: true }]}>
+                    <Input placeholder="Как в профиле" size="large" />
+                </Form.Item>
+                <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                        <Form.Item name="inn" label="ИНН" rules={[{ required: true }]}>
+                            <Input placeholder="7707083893" />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item name="corporate_email" label="Корпоративная почта" rules={[{ required: true, type: 'email' }]}>
+                            <Input placeholder="hr@company.ru" />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Form.Item name="links" label="Ссылки (сайт, профили)">
+                    <Input.TextArea rows={2} placeholder="https://..." />
+                </Form.Item>
+                <Space wrap>
+                    <Button type="primary" htmlType="submit">Отправить на проверку</Button>
+                    <Button onClick={markVerifiedDemo}>Демо: отметить верифицированной (локально)</Button>
+                </Space>
+            </Form>
+
+            <Form layout="vertical" form={form} onFinish={handleSave}>
             <Divider orientation="left">Основная информация</Divider>
 
             <Row gutter={24}>
@@ -32,7 +76,7 @@ const CompanyTab = ({ notify }) => {
             <Row gutter={24}>
                 <Col xs={24} md={12}>
                     <Form.Item label="Сфера деятельности" name="area">
-                        <Select options={dictionaries} placeholder="Выберите сферу" size="large" />
+                        <Select options={dictionaries} placeholder="Выберите сферу" size="large" optionFilterProp="label" />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
@@ -143,6 +187,7 @@ const CompanyTab = ({ notify }) => {
                 Сохранить данные
             </Button>
         </Form>
+        </Space>
     );
 };
 

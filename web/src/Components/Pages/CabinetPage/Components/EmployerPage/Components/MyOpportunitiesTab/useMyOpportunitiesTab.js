@@ -1,23 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { getEmployerOpportunities } from '../../../../../../../local/tramplinStore.js'
 
-const useMyOpportunitiesTab = (notify) => {
-    const [opportunities, setOpportunities] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+const useMyOpportunitiesTab = () => {
+  const { userData } = useSelector((s) => s.auth)
+  const [v, setV] = useState(0)
+  const [statusFilter, setStatusFilter] = useState('all')
 
-    useEffect(() => {
-        const fetchOpportunities = async () => {
-            setIsLoading(true);
-            try {
-            } catch (error) {
-                notify('Ошибка', 'Не удалось загрузить возможности', 'error');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchOpportunities();
-    }, []);
+  useEffect(() => {
+    const fn = () => setV((x) => x + 1)
+    window.addEventListener('tramplin-store-changed', fn)
+    return () => window.removeEventListener('tramplin-store-changed', fn)
+  }, [])
 
-    return { opportunities, isLoading };
-};
+  const opportunities = useMemo(() => {
+    const list = getEmployerOpportunities(userData?.id)
+    const mapped = list.map((o) => ({
+      id: o.id,
+      title: o.title,
+      kind: o.kind || (o.type === 'mentor' ? 'mentorship' : o.type),
+      status: o.status || 'active',
+      moderationStatus: o.moderationStatus || 'approved',
+    }))
+    if (statusFilter === 'all') return mapped
+    return mapped.filter((r) => r.status === statusFilter)
+  }, [userData?.id, v, statusFilter])
 
-export default useMyOpportunitiesTab;
+  return { opportunities, isLoading: false, statusFilter, setStatusFilter }
+}
+
+export default useMyOpportunitiesTab

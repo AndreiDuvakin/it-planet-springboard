@@ -33,8 +33,8 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    first_name: Optional[str] = Field(default=None, max_length=250)
-    last_name: Optional[str] = Field(default=None, max_length=250)
+    first_name: Optional[str] = Field(max_length=250)
+    last_name: Optional[str] = Field(max_length=250)
     patronymic: Optional[str] = Field(default=None, max_length=250)
     email: Optional[EmailStr] = None
     birthdate: Optional[date] = None

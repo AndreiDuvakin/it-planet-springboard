@@ -24,8 +24,14 @@ export const baseQuery = fetchBaseQuery({
 });
 
 export const baseQueryWithAuth = async (args, api, extraOptions) => {
+    const tokenBefore = localStorage.getItem('access_token');
     const result = await baseQuery(args, api, extraOptions);
-    if (result.error && [401, 403].includes(result.error.status) && !args.url.includes('auth')) {
+    if (
+        result.error &&
+        [401, 403].includes(result.error.status) &&
+        !String(args?.url || '').includes('auth') &&
+        tokenBefore
+    ) {
         localStorage.removeItem('access_token');
         api.dispatch(logout());
         window.location.href = '/login';

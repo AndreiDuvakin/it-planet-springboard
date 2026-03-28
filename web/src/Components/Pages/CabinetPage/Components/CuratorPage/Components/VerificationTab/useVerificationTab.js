@@ -1,27 +1,32 @@
-import { useState } from 'react';
-import { notification } from 'antd';
+import { notification } from 'antd'
+import { useState } from 'react'
+import { setVerificationRequestStatus } from '../../../../../../../local/tramplinStore.js'
 
-const useVerificationTab = () => {
-    const [loading, setLoading] = useState(false);
+const useVerificationTab = (onRefresh) => {
+  const [loading, setLoading] = useState(false)
 
-    const handleVerify = async (id, decision) => {
-        setLoading(true);
-        try {
-            const messages = {
-                approve: 'Компания верифицирована',
-                reject: 'Заявка отклонена',
-                clarify: 'Запрос на уточнение отправлен'
-            };
+  const handleDecision = async (id, decision) => {
+    setLoading(true)
+    try {
+      if (decision === 'approve') {
+        setVerificationRequestStatus(id, 'approved')
+        notification.success({ message: 'Компания верифицирована' })
+      } else if (decision === 'reject') {
+        setVerificationRequestStatus(id, 'rejected')
+        notification.warning({ message: 'Заявка отклонена' })
+      } else {
+        setVerificationRequestStatus(id, 'clarify')
+        notification.info({ message: 'Запрошено уточнение' })
+      }
+      if (onRefresh) onRefresh()
+    } catch (error) {
+      notification.error({ message: 'Ошибка' })
+    } finally {
+      setLoading(false)
+    }
+  }
 
-            notification.success({ message: messages[decision] });
-        } catch (error) {
-            notification.error({ message: 'Ошибка обработки заявки' });
-        } finally {
-            setLoading(false);
-        }
-    };
+  return { loading, handleDecision }
+}
 
-    return { loading, handleVerify };
-};
-
-export default useVerificationTab;
+export default useVerificationTab

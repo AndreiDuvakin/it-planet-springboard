@@ -1,29 +1,29 @@
-import { useState } from 'react';
-import { notification } from 'antd';
+import { notification } from 'antd'
+import { useState } from 'react'
+import { patchOpportunity } from '../../../../../../../local/tramplinStore.js'
 
-const useModerationTab = () => {
-    const [submitting, setSubmitting] = useState(false);
+const useModerationTab = (onRefresh) => {
+  const [loading, setLoading] = useState(false)
 
-    const handleChangeStatus = async (id, status) => {
-        setSubmitting(true);
-        try {
-            notification.success({ message: 'Статус карточки изменен' });
-        } catch (error) {
-            notification.error({ message: 'Ошибка при смене статуса' });
-        } finally {
-            setSubmitting(false);
-        }
-    };
+  const updateOpportunity = async (id, partial) => {
+    setLoading(true)
+    try {
+      const p = { ...partial }
+      if (p.status) {
+        p.moderationStatus = p.status
+        delete p.status
+      }
+      patchOpportunity(id, p)
+      notification.success({ message: 'Карточка обновлена' })
+      if (onRefresh) onRefresh()
+    } catch (error) {
+      notification.error({ message: 'Ошибка' })
+    } finally {
+      setLoading(false)
+    }
+  }
 
-    const handleSaveComment = async (id, comment) => {
-        try {
-            notification.info({ message: 'Комментарий обновлен' });
-        } catch (error) {
-            notification.error({ message: 'Не удалось сохранить комментарий' });
-        }
-    };
+  return { loading, updateOpportunity }
+}
 
-    return { submitting, handleChangeStatus, handleSaveComment };
-};
-
-export default useModerationTab;
+export default useModerationTab

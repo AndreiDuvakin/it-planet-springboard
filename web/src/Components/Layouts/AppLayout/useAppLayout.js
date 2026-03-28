@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useMemo, useState, useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {getFavoriteIds} from "../../Pages/FavoritesPage/favorites.js";
 import useAuthUtils from "../../../Hook/useAuthUtils.js";
@@ -17,7 +17,13 @@ const useAppLayout = () => {
         navigate(key);
     };
 
-    const favoritesCount = useMemo(() => getFavoriteIds().length, []);
+    const [favTick, setFavTick] = useState(0);
+    useEffect(() => {
+        const fn = () => setFavTick((t) => t + 1);
+        window.addEventListener("tramplin-store-changed", fn);
+        return () => window.removeEventListener("tramplin-store-changed", fn);
+    }, []);
+    const favoritesCount = useMemo(() => getFavoriteIds().length, [favTick]);
 
     const handleLogoClick = () => navigate('/');
     const handleLoginClick = () => navigate('/login');

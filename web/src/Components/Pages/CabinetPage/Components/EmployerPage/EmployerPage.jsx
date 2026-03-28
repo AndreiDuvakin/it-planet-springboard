@@ -18,7 +18,9 @@ function EmployerPage() {
         modalState,
         openCreate,
         openEdit,
-        closeModal
+        closeModal,
+        responsesTable,
+        refreshResponses,
     } = useEmployerCabinet();
 
     const tabItems =[
@@ -29,7 +31,7 @@ function EmployerPage() {
             label: 'Мои возможности',
             children: <MyOpportunitiesTab openCreate={openCreate} openEdit={openEdit} notify={notify} />
         },
-        { key: 'responses', label: 'Отклики', children: <ResponsesTab notify={notify} /> },
+        { key: 'responses', label: 'Отклики', children: <ResponsesTab data={responsesTable} onRefresh={refreshResponses} notify={notify} /> },
     ];
 
     return (

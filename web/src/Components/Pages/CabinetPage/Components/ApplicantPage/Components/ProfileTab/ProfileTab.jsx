@@ -12,18 +12,19 @@ import {
     Card,
     Typography,
     Spin,
-    InputNumber
+    InputNumber, Space
 } from 'antd';
-import {DeleteOutlined, PlusOutlined} from '@ant-design/icons';
+import {DeleteOutlined, LockOutlined, PlusOutlined} from '@ant-design/icons';
 import JoditEditor from "jodit-react";
 import useProfileTab from './useProfileTab';
 import dayjs from "dayjs";
 
-const {Text} = Typography;
+const {Text, Title} = Typography;
 
 function ProfileTab({initialData, onRefresh}) {
     const {
         form,
+        passwordForm,
         isSaving,
         handleSave,
         editorRef,
@@ -31,6 +32,7 @@ function ProfileTab({initialData, onRefresh}) {
         universitiesOptions,
         applicantSkillTagsOptions,
         experienceLevelsOptions,
+        handlePasswordFinish,
     } = useProfileTab(initialData, onRefresh);
 
     return (
@@ -281,13 +283,71 @@ function ProfileTab({initialData, onRefresh}) {
                         size="large"
                         loading={isSaving}
                         style={{padding: '0 40px'}}
+                        block
                     >
                         Сохранить профиль
                     </Button>
+
                 </Form>
             </Spin>
+
+            <Col span={24}>
+                <Divider titlePlacement="left">Смена пароля</Divider>
+
+                <Form form={passwordForm} layout="vertical" onFinish={handlePasswordFinish}>
+                    <Row gutter={16}>
+                        <Col xs={24} md={12}>
+                            <Form.Item
+                                name="password"
+                                label="Новый пароль"
+                                rules={[
+                                    {required: true, message: "Введите пароль"},
+                                    {min: 8, message: "Минимум 8 символов"},
+                                ]}
+                            >
+                                <Input.Password prefix={<LockOutlined/>} size="large"
+                                                placeholder="••••••••"/>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} md={12}>
+                            <Form.Item
+                                name="repeat_password"
+                                label="Повторите пароль"
+                                dependencies={["password"]}
+                                rules={[
+                                    {required: true, message: "Повторите пароль"},
+                                    ({getFieldValue}) => ({
+                                        validator(_, value) {
+                                            if (!value || getFieldValue("password") === value) {
+                                                return Promise.resolve();
+                                            }
+                                            return Promise.reject(new Error("Пароли не совпадают"));
+                                        },
+                                    }),
+                                ]}
+                            >
+                                <Input.Password prefix={<LockOutlined/>} size="large"
+                                                placeholder="••••••••"/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Form.Item style={{marginBottom: 0, textAlign: "right"}}>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={<LockOutlined/>}
+                            size="large"
+                            block
+                        >
+                            Изменить пароль
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Col>
         </div>
     );
-};
+}
 
 export default ProfileTab;

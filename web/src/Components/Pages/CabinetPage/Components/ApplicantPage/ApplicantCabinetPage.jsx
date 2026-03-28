@@ -6,6 +6,7 @@ import ProfileTab from './Components/ProfileTab/ProfileTab';
 import ApplicationsTab from './Components/ApplicationsTab/ApplicationsTab';
 import ContactsTab from './Components/ContactsTab/ContactsTab';
 import RecommendationsTab from './Components/RecommendationsTab/RecommendationsTab';
+import PrivacyTab from './Components/PrivacyTab/PrivacyTab.jsx';
 
 const { Title } = Typography;
 
@@ -32,6 +33,11 @@ function ApplicantCabinetPage() {
             key: 'contacts',
             label: 'Контакты',
             children: <ContactsTab data={contacts} onRefresh={refresh} />
+        },
+        {
+            key: 'privacy',
+            label: 'Приватность',
+            children: <PrivacyTab />
         }
     ];
 

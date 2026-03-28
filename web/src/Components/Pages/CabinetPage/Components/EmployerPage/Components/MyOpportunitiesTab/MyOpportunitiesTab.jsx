@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, Flex, Typography, Dropdown, Space, Tag, Skeleton } from 'antd';
+import { Table, Button, Flex, Typography, Dropdown, Space, Tag, Skeleton, Segmented } from 'antd';
 import {
     PlusOutlined,
     DownOutlined,
@@ -28,7 +28,7 @@ const addMenuItems = [
 ];
 
 const MyOpportunitiesTab = ({ openCreate, openEdit, notify }) => {
-    const { opportunities, isLoading } = useMyOpportunitiesTab(notify);
+    const { opportunities, isLoading, statusFilter, setStatusFilter } = useMyOpportunitiesTab();
 
     const columns = [
         {
@@ -49,7 +49,14 @@ const MyOpportunitiesTab = ({ openCreate, openEdit, notify }) => {
             title: 'Статус',
             dataIndex: 'status',
             width: 140,
-            render: (status) => <Tag>{status}</Tag>,
+            render: (status, row) => (
+                <Space direction="vertical" size={2}>
+                    <Tag>{status}</Tag>
+                    {row.moderationStatus && row.moderationStatus !== 'approved' && (
+                        <Tag color="orange">Модерация: {row.moderationStatus}</Tag>
+                    )}
+                </Space>
+            ),
         },
         {
             title: 'Действия',
@@ -65,6 +72,16 @@ const MyOpportunitiesTab = ({ openCreate, openEdit, notify }) => {
     return (
         <div style={{ display: 'grid', gap: 12 }}>
             <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
+                <Segmented
+                    options={[
+                        { label: 'Все', value: 'all' },
+                        { label: 'Активные', value: 'active' },
+                        { label: 'Закрытые', value: 'closed' },
+                        { label: 'Запланированные', value: 'scheduled' },
+                    ]}
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                />
                 <Text type="secondary">
                     Управляйте активными, закрытыми и запланированными возможностями
                 </Text>

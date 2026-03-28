@@ -8,7 +8,7 @@ import {
     useGetApplicantEducationsByApplicantIdQuery,
     useReplaceApplicantEducationsMutation
 } from "../../../../../../../Api/applicantEducationsApi.js";
-import {useUpdateUserMutation} from "../../../../../../../Api/usersApi.js";
+import {useUpdateUserMutation, useUpdateUserPasswordMutation} from "../../../../../../../Api/usersApi.js";
 import {useUpdateApplicantProfileMutation} from "../../../../../../../Api/applicantProfilesApi.js";
 import {
     useGetApplicantSkillsByApplicantIdQuery,
@@ -21,6 +21,7 @@ const useProfileTab = () => {
     const [form] = Form.useForm();
     const {editorRef, joditConfig, getContent, setContent} = useEditor();
     const {userData} = useSelector((state) => state.auth);
+    const [passwordForm] = Form.useForm();
 
     const {
         data: universities = [],
@@ -87,6 +88,37 @@ const useProfileTab = () => {
         }
     }, [userData, educationsData, form, setContent, skillsData]);
 
+    const [
+        changeUserPassword,
+        {
+            isLoading: isLoadingChangePassword,
+            isError: isErrorChangePassword,
+        }
+    ] = useUpdateUserPasswordMutation();
+
+    const handlePasswordFinish = async () => {
+        const values = passwordForm.getFieldsValue();
+        const payload = {
+            ...values,
+        };
+
+        try {
+            await changeUserPassword({userId: userData.id, ...payload}).unwrap();
+            notification.success({
+                title: "Пароль изменен",
+                description: "Пароль успешно изменен",
+                placement: "topRight",
+            });
+            passwordForm.resetFields();
+        } catch (error) {
+            notification.error({
+                title: "Ошибка изменения пароля",
+                description: error?.data?.detail || "Не удалось изменить пароль",
+                placement: "topRight",
+            });
+        }
+    };
+
     const handleSave = async (values) => {
         try {
             const applicantId = userData?.applicant_profile?.id;
@@ -147,6 +179,7 @@ const useProfileTab = () => {
 
     return {
         form,
+        passwordForm,
         isSaving: updatingUser || updatingEducations || updatingApplicantProfile || educationsLoading || skillsLoading || updatingSkills,
         handleSave,
         editorRef,
@@ -154,6 +187,7 @@ const useProfileTab = () => {
         universitiesOptions,
         applicantSkillTagsOptions,
         experienceLevelsOptions,
+        handlePasswordFinish,
     };
 };
 

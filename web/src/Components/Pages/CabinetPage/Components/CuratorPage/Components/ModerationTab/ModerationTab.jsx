@@ -26,16 +26,16 @@ function ModerationTab({ data, onRefresh }) {
             title: 'Тип',
             dataIndex: 'type',
             key: 'type',
-            render: (type) => <Tag color="blue">{type}</Tag>,
+            render: (type) => <Tag color="blue">{String(type)}</Tag>,
         },
         {
             title: 'Статус',
-            dataIndex: 'status',
-            key: 'status',
+            dataIndex: 'moderationStatus',
+            key: 'moderationStatus',
             width: 200,
             render: (status, record) => (
                 <Select
-                    value={status}
+                    value={status || 'pending'}
                     style={{ width: '100%' }}
                     loading={loading}
                     onChange={(val) => updateOpportunity(record.id, { status: val })}
@@ -49,13 +49,13 @@ function ModerationTab({ data, onRefresh }) {
         },
         {
             title: 'Комментарий модератора',
-            dataIndex: 'comment',
-            key: 'comment',
+            dataIndex: 'moderationComment',
+            key: 'moderationComment',
             render: (comment, record) => (
                 <Input
                     defaultValue={comment}
                     placeholder="Причина отклонения..."
-                    onBlur={(e) => updateOpportunity(record.id, { comment: e.target.value })}
+                    onBlur={(e) => updateOpportunity(record.id, { moderationComment: e.target.value })}
                 />
             ),
         },

@@ -1,11 +1,12 @@
 import React from 'react';
 import { Form, Row, Col, Input, Button, DatePicker, Divider, Typography } from 'antd';
 import useAccountTab from './useAccountTab';
+import {LockOutlined} from "@ant-design/icons";
 
 const { Text } = Typography;
 
 function AccountTab() {
-    const { form, loading, handleSave } = useAccountTab();
+    const { form, passwordForm, loading, handleSave, handlePasswordFinish } = useAccountTab();
 
     return (
         <div style={{ padding: '10px 0' }}>
@@ -15,79 +16,106 @@ function AccountTab() {
                 onFinish={handleSave}
                 requiredMark={false}
             >
+                <Divider titlePlacement="left">Личные данные</Divider>
                 <Row gutter={24}>
                     <Col xs={24} md={8}>
-                        <Form.Item label="Фамилия" name="lastName" rules={[{ required: true, message: 'Обязательное поле' }]}>
-                            <Input placeholder="Введите фамилию" size="large" />
+                        <Form.Item label="Фамилия" name="last_name"
+                                   rules={[{required: true, message: 'Обязательное поле'}]}>
+                            <Input placeholder="Введите фамилию" size="large"/>
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={8}>
-                        <Form.Item label="Имя" name="firstName" rules={[{ required: true, message: 'Обязательное поле' }]}>
-                            <Input placeholder="Введите имя" size="large" />
+                        <Form.Item label="Имя" name="first_name"
+                                   rules={[{required: true, message: 'Обязательное поле'}]}>
+                            <Input placeholder="Введите имя" size="large"/>
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={8}>
-                        <Form.Item label="Отчество" name="middleName">
-                            <Input placeholder="Введите отчество" size="large" />
+                        <Form.Item label="Отчество" name="patronymic">
+                            <Input placeholder="Введите отчество" size="large"/>
                         </Form.Item>
                     </Col>
                 </Row>
 
                 <Row gutter={24}>
                     <Col xs={24} md={8}>
-                        <Form.Item label="Дата рождения" name="birthdate">
-                            <DatePicker style={{ width: '100%' }} format="DD.MM.YYYY" size="large" />
+                        <Form.Item label="Дата рождения" name="birthdate"
+                                   rules={[{required: true, message: 'Укажите дату'}]}>
+                            <DatePicker style={{width: '100%'}} format="DD.MM.YYYY" size="large"/>
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={8}>
-                        <Form.Item label="Email" name="email">
-                            <Input placeholder="example@mail.com" size="large" />
+                        <Form.Item label="Email" name="email"
+                                   rules={[{type: 'email', message: 'Некорректный email'}]}>
+                            <Input placeholder="example@mail.com" size="large"/>
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={8}>
                         <Form.Item label="Логин" name="login">
-                            <Input size="large" />
+                            <Input disabled size="large"/>
                         </Form.Item>
                     </Col>
                 </Row>
 
-                <Divider orientation="left">Безопасность</Divider>
-
-                <Row gutter={24}>
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Новый пароль"
-                            name="password"
-                            extra="Оставьте пустым, если не хотите менять"
-                        >
-                            <Input.Password placeholder="Введите новый пароль" size="large" />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Подтверждение пароля"
-                            name="confirmPassword"
-                            dependencies={['password']}
-                            rules={[
-                                ({ getFieldValue }) => ({
-                                    validator(_, value) {
-                                        if (!value || getFieldValue('password') === value) {
-                                            return Promise.resolve();
-                                        }
-                                        return Promise.reject(new Error('Пароли не совпадают'));
-                                    },
-                                }),
-                            ]}
-                        >
-                            <Input.Password placeholder="Повторите пароль" size="large" />
-                        </Form.Item>
-                    </Col>
-                </Row>
-
-                <Button type="primary" htmlType="submit" loading={loading} size="large">
+                <Button block type="primary" htmlType="submit" loading={loading} size="large">
                     Сохранить изменения
                 </Button>
             </Form>
+            <Col span={24}>
+                <Divider titlePlacement="left">Смена пароля</Divider>
+
+                <Form form={passwordForm} layout="vertical" onFinish={handlePasswordFinish}>
+                    <Row gutter={16}>
+                        <Col xs={24} md={12}>
+                            <Form.Item
+                                name="password"
+                                label="Новый пароль"
+                                rules={[
+                                    {required: true, message: "Введите пароль"},
+                                    {min: 8, message: "Минимум 8 символов"},
+                                ]}
+                            >
+                                <Input.Password prefix={<LockOutlined/>} size="large"
+                                                placeholder="••••••••"/>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} md={12}>
+                            <Form.Item
+                                name="repeat_password"
+                                label="Повторите пароль"
+                                dependencies={["password"]}
+                                rules={[
+                                    {required: true, message: "Повторите пароль"},
+                                    ({getFieldValue}) => ({
+                                        validator(_, value) {
+                                            if (!value || getFieldValue("password") === value) {
+                                                return Promise.resolve();
+                                            }
+                                            return Promise.reject(new Error("Пароли не совпадают"));
+                                        },
+                                    }),
+                                ]}
+                            >
+                                <Input.Password prefix={<LockOutlined/>} size="large"
+                                                placeholder="••••••••"/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Form.Item style={{marginBottom: 0, textAlign: "right"}}>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={<LockOutlined/>}
+                            size="large"
+                            block
+                        >
+                            Изменить пароль
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Col>
         </div>
     );
 }

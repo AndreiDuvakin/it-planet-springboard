@@ -5,8 +5,8 @@ import useResponsesTab from './useResponsesTab';
 
 const { Text } = Typography;
 
-function ResponsesTab({ data, onRefresh }) {
-    const { handleStatusChange, handleNoteBlur } = useResponsesTab(onRefresh);
+function ResponsesTab({ data = [], onRefresh }) {
+    const { handleStatusChange, handleNoteBlur, loading } = useResponsesTab(onRefresh);
 
     const columns = [
         {
@@ -59,7 +59,7 @@ function ResponsesTab({ data, onRefresh }) {
 
     return (
         <div style={{ padding: '10px 0' }}>
-            <Table rowKey="id" columns={columns} dataSource={data} pagination={{ pageSize: 10 }} />
+            <Table rowKey="id" columns={columns} dataSource={data} pagination={{ pageSize: 10 }} loading={loading} />
         </div>
     );
 }

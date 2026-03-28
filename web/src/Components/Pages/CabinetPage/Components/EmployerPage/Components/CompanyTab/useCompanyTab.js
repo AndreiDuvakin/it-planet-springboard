@@ -1,10 +1,18 @@
 import { useEffect } from 'react';
 import { Form, notification } from 'antd';
+import { useSelector } from 'react-redux';
 import { useGetProfileQuery, useCreateOrUpdateCompanyMutation } from "../../../../../../../Api/companyApi";
 import { useGetAllIndustriesQuery } from "../../../../../../../Api/industriesApi";
+import {
+    submitEmployerVerification,
+    getEmployerVerificationStatus,
+    setEmployerVerificationUserStatus,
+} from "../../../../../../../local/tramplinStore.js";
 
 const useCompanyTab = () => {
     const [form] = Form.useForm();
+    const [verForm] = Form.useForm();
+    const { userData } = useSelector((s) => s.auth);
     const { data: industries = [], isLoading: isDictLoading } = useGetAllIndustriesQuery();
     const { data: companyData, isLoading: isFetching } = useGetProfileQuery();
     const [saveCompany, { isLoading: isSaving }] = useCreateOrUpdateCompanyMutation();
@@ -67,12 +75,45 @@ const useCompanyTab = () => {
         }
     };
 
+    const verificationStatus = userData?.id != null ? getEmployerVerificationStatus(userData.id) : 'none';
+
+    const submitVerification = async () => {
+        try {
+            const v = await verForm.validateFields();
+            submitEmployerVerification({
+                userId: userData.id,
+                company: companyData?.title || v.company_name,
+                inn: v.inn,
+                corporateEmail: v.corporate_email,
+                links: v.links,
+            });
+            notification.success({
+                message: 'Заявка отправлена',
+                description: 'Куратор проверит данные и подтвердит компанию.',
+            });
+            verForm.resetFields();
+        } catch (e) {
+            /* validation */
+        }
+    };
+
+    const markVerifiedDemo = () => {
+        if (userData?.id == null) return;
+        setEmployerVerificationUserStatus(userData.id, 'approved');
+        notification.info({ message: 'Локально отмечено как верифицированная (для демо API)' });
+    };
+
     return {
         form,
+        verForm,
         isLoading: isDictLoading || isFetching,
         isSaving,
         handleSave,
-        dictionaries: industries,
+        dictionaries: industries.map((i) => ({ value: i.id, label: i.title })),
+        verificationStatus,
+        submitVerification,
+        markVerifiedDemo,
+        companyTitle: companyData?.title,
     };
 };
 

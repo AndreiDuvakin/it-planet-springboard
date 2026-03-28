@@ -31,12 +31,15 @@ import {
     salaryText,
     useHomePage,
 } from './useHomePage'
+import HomeMap from './HomeMap.jsx'
 
 const {Title, Text} = Typography
 
 const TYPE_LABEL = {
     vacancy: 'Вакансия',
+    vacancy_junior: 'Вакансия (Junior)',
     internship: 'Стажировка',
+    mentor: 'Менторство',
     mentorship: 'Менторство',
     event: 'Мероприятие',
 }
@@ -56,10 +59,10 @@ export default function HomePage() {
         filtered,
         selectedItem,
         selectedId,
-        mapSrc,
         onSelectMapItem,
         onToggleFavorite,
         allSkillTags,
+        favoriteCompanyNames,
     } = useHomePage()
 
     return (
@@ -271,13 +274,11 @@ export default function HomePage() {
                                                             border: '1px solid #f0f0f0',
                                                         }}
                                                     >
-                                                        <iframe
-                                                            key={mapSrc}
-                                                            title="Yandex map"
-                                                            src={mapSrc}
-                                                            width="100%"
-                                                            height="100%"
-                                                            style={{display: 'block', minHeight: 380, border: "none"}}
+                                                        <HomeMap
+                                                            items={filtered}
+                                                            selectedId={selectedId}
+                                                            onSelect={onSelectMapItem}
+                                                            favoriteCompanyNames={favoriteCompanyNames}
                                                         />
                                                     </div>
 
