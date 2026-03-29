@@ -271,7 +271,9 @@ https://springboard.numerum.team
 
 ## Демонстрация 
 
-Видео ДЕМОНСТРАЦИИ проекта достпуно по ссылке: https://vkvideo.ru/video-237166148_456239017
+Видео ДЕМОНСТРАЦИИ проекта достпуно по ссылке: https://rutube.ru/video/b735056d4624028858cc18f4b8cba38b/
+
+А также по этой ссылке: https://disk.yandex.ru/i/jfSKMd9uadv2rg
 
 Пожалуйста, досмотрите видео целиком.
 
