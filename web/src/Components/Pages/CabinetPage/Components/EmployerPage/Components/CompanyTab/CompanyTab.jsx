@@ -6,7 +6,7 @@ import {
 import { DeleteOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons'
 import useCompanyTab from './useCompanyTab'
 
-const { Title } = Typography
+const { Title, Text } = Typography
 
 const CompanyTab = () => {
     const {
@@ -15,10 +15,11 @@ const CompanyTab = () => {
         companyTitle,
     } = useCompanyTab()
 
-    if (isLoading) return <Skeleton active />
+    if (isLoading) return <Skeleton active paragraph={{ rows: 10 }} />
 
     return (
         <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            
             <div style={{
                 padding: 16, borderRadius: 10,
                 border: `1px solid ${verificationStatus === 'approved' ? '#b7eb8f' : verificationStatus === 'pending' ? '#ffe58f' : '#d9d9d9'}`,
@@ -27,38 +28,39 @@ const CompanyTab = () => {
                 <Title level={5} style={{ marginTop: 0, marginBottom: 12 }}>Статус верификации компании</Title>
                 <p style={{ marginBottom: 16 }}>
                     <strong>Текущий статус:</strong>{' '}
-                    {verificationStatus === 'approved' ? 'Верифицирована ✓' :
-                     verificationStatus === 'pending' ? 'На рассмотрении' :
-                     verificationStatus === 'rejected' ? 'Отклонена — подайте повторно' :
-                     'Не верифицирована'}
+                    <Text type={verificationStatus === 'approved' ? 'success' : 'warning'}>
+                        {verificationStatus === 'approved' ? 'Верифицирована ✓' :
+                         verificationStatus === 'pending' ? 'На рассмотрении' :
+                         verificationStatus === 'rejected' ? 'Отклонена — подайте повторно' :
+                         'Не верифицирована'}
+                    </Text>
                 </p>
                 {verificationStatus !== 'approved' && (
-                    <>
-                        <Form layout="vertical" form={verForm} onFinish={submitVerification}>
-                            <Form.Item label="Название компании" name="company_name" initialValue={companyTitle} rules={[{ required: true, message: 'Введите название' }]}>
-                                <Input placeholder="Как в профиле" />
-                            </Form.Item>
-                            <Row gutter={16}>
-                                <Col xs={24} md={12}>
-                                    <Form.Item name="corporate_email" label="Корпоративная почта" rules={[{ required: true, type: 'email', message: 'Введите email' }]}>
-                                        <Input placeholder="hr@company.ru" />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-                            <Form.Item name="links" label="Ссылки (сайт, соцсети)">
-                                <Input.TextArea rows={2} placeholder="https://..." />
-                            </Form.Item>
-                            <Button type="primary" htmlType="submit" disabled={verificationStatus === 'pending'}>
-                                Отправить на проверку
-                            </Button>
-                        </Form>
-                    </>
+                    <Form layout="vertical" form={verForm} onFinish={submitVerification}>
+                        <Form.Item label="Название компании" name="company_name" rules={[{ required: true, message: 'Введите название' }]}>
+                            <Input placeholder="Как в профиле" />
+                        </Form.Item>
+                        <Row gutter={16}>
+                            <Col xs={24} md={12}>
+                                <Form.Item name="corporate_email" label="Корпоративная почта" rules={[{ required: true, type: 'email', message: 'Введите email' }]}>
+                                    <Input placeholder="hr@company.ru" />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Form.Item name="links" label="Ссылки (сайт, соцсети)">
+                            <Input.TextArea rows={2} placeholder="https://..." />
+                        </Form.Item>
+                        <Button type="primary" htmlType="submit" disabled={verificationStatus === 'pending'}>
+                            Отправить на проверку
+                        </Button>
+                    </Form>
                 )}
             </div>
 
-            {/* ── Профиль компании ── */}
             <Form layout="vertical" form={form} onFinish={handleSave}>
-                <Divider orientation="left">Основная информация</Divider>
+                {/* Исправлено: orientation -> titlePlacement */}
+                <Divider orientation="left" titlePlacement="left">Основная информация</Divider>
+                
                 <Row gutter={24}>
                     <Col xs={24} md={16}>
                         <Form.Item label="Наименование" name="name" rules={[{ required: true, message: 'Введите название' }]}>
@@ -66,7 +68,7 @@ const CompanyTab = () => {
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={8}>
-                        <Form.Item label="ИНН" name="inn" rules={[{ required: true }]}>
+                        <Form.Item label="ИНН" name="inn" rules={[{ required: true, message: 'Введите ИНН' }]}>
                             <Input placeholder="7707083893" size="large" />
                         </Form.Item>
                     </Col>
@@ -79,7 +81,16 @@ const CompanyTab = () => {
                 <Row gutter={24}>
                     <Col xs={24} md={12}>
                         <Form.Item label="Сфера деятельности" name="area" rules={[{ required: true, message: 'Выберите сферу деятельности' }]}>
-                            <Select options={dictionaries} placeholder="Выберите сферу" size="large" optionFilterProp="label" />
+                            <Select 
+                                showSearch
+                                options={dictionaries} 
+                                placeholder="Выберите сферу" 
+                                size="large" 
+                                optionFilterProp="label"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                            />
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={12}>
@@ -140,13 +151,14 @@ const CompanyTab = () => {
                     <Col xs={24} md={12}>
                         <Form.Item name="logo_id" hidden><Input /></Form.Item>
                         <Form.Item label="Логотип" name="logo_file" valuePropName="fileList"
-                                   getValueFromEvent={e => {
-                                       if (Array.isArray(e)) return e
-                                       if (e.file.status === 'done') form.setFieldValue('logo_id', e.file.response?.id)
-                                       return e?.fileList
-                                   }}>
+                                    getValueFromEvent={e => Array.isArray(e) ? e : e?.fileList}>
                             <Upload action="http://localhost:5000/api/v1/company_profiles/files/upload-logo"
                                     headers={{ Authorization: `Bearer ${localStorage.getItem('access_token')}` }}
+                                    onChange={(info) => {
+                                        if (info.file.status === 'done') {
+                                            form.setFieldValue('logo_id', info.file.response?.id);
+                                        }
+                                    }}
                                     listType="picture" maxCount={1} accept=".jpg,.jpeg,.png">
                                 <Button icon={<UploadOutlined />} size="large" block>Загрузить логотип</Button>
                             </Upload>
@@ -155,13 +167,14 @@ const CompanyTab = () => {
                     <Col xs={24} md={12}>
                         <Form.Item name="official_photo_id" hidden><Input /></Form.Item>
                         <Form.Item label="Фото офиса" name="photo_file" valuePropName="fileList"
-                                   getValueFromEvent={e => {
-                                       if (Array.isArray(e)) return e
-                                       if (e.file.status === 'done') form.setFieldValue('official_photo_id', e.file.response?.id)
-                                       return e?.fileList
-                                   }}>
+                                    getValueFromEvent={e => Array.isArray(e) ? e : e?.fileList}>
                             <Upload action="http://localhost:5000/api/v1/company_profiles/files/upload-photo"
                                     headers={{ Authorization: `Bearer ${localStorage.getItem('access_token')}` }}
+                                    onChange={(info) => {
+                                        if (info.file.status === 'done') {
+                                            form.setFieldValue('official_photo_id', info.file.response?.id);
+                                        }
+                                    }}
                                     listType="picture" maxCount={1} accept=".jpg,.jpeg,.png">
                                 <Button icon={<UploadOutlined />} size="large" block>Загрузить фото</Button>
                             </Upload>
@@ -169,8 +182,8 @@ const CompanyTab = () => {
                     </Col>
                 </Row>
 
-                <Button type="primary" htmlType="submit" loading={isSaving} size="large" style={{ minWidth: 150, marginTop: 8 }}>
-                    Сохранить данные
+                <Button type="primary" htmlType="submit" loading={isSaving} size="large" style={{ minWidth: 200, marginTop: 24, borderRadius: 8 }}>
+                    Сохранить изменения
                 </Button>
             </Form>
         </Space>

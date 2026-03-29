@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Form, notification } from 'antd';
 import { useSelector } from 'react-redux';
 import { useGetProfileQuery, useCreateOrUpdateCompanyMutation } from "../../../../../../../Api/companyApi";
@@ -12,9 +12,12 @@ const useCompanyTab = () => {
     const [form] = Form.useForm();
     const [verForm] = Form.useForm();
     const { userData } = useSelector((s) => s.auth);
+    
     const { data: industries = [], isLoading: isDictLoading } = useGetAllIndustriesQuery();
-    const { data: companyData, isLoading: isFetching } = useGetProfileQuery();
+    const { data: companyData, isLoading: isFetching, refetch } = useGetProfileQuery();
     const [saveCompany, { isLoading: isSaving }] = useCreateOrUpdateCompanyMutation();
+
+ const dictionaries = industries;
 
     useEffect(() => {
         if (companyData) {
@@ -22,7 +25,7 @@ const useCompanyTab = () => {
                 name: companyData.title,
                 inn: companyData.inn,
                 about: companyData.description,
-                area: companyData.industry_id,
+                area: companyData.industry_id ? Number(companyData.industry_id) : undefined,
                 corporate_email: companyData.corporate_email,
                 site: companyData.website_url,
                 video_url: companyData.video_url,
@@ -45,7 +48,7 @@ const useCompanyTab = () => {
                 }] : [],
             });
         }
-    }, [companyData, form]);
+    }, [companyData, form, industries]);
 
     const handleSave = async (values) => {
         try {
@@ -64,25 +67,25 @@ const useCompanyTab = () => {
 
             await saveCompany(payload).unwrap();
             notification.success({ message: 'Успешно', description: 'Профиль компании обновлен' });
+            refetch();
         } catch (error) {
             notification.error({
                 message: 'Ошибка',
-                description: error.data?.detail?.[0]?.msg || 'Не удалось сохранить данные',
+                description: error.data?.detail?.[0]?.msg || error.data?.detail || 'Не удалось сохранить данные',
             });
         }
     };
 
     const verificationStatus = userData?.id != null ? getEmployerVerificationStatus(userData.id) : 'none';
 
-    const submitVerification = async () => {
+    const submitVerification = async (values) => {
         try {
-            const v = await verForm.validateFields();
             submitEmployerVerification({
                 userId: userData.id,
-                company: companyData?.title || v.company_name,
-                inn: v.inn,
-                corporateEmail: v.corporate_email,
-                links: v.links,
+                company: companyData?.title || values.company_name,
+                inn: values.inn || companyData?.inn,
+                corporateEmail: values.corporate_email,
+                links: values.links,
             });
             notification.success({
                 message: 'Заявка отправлена',
@@ -90,6 +93,7 @@ const useCompanyTab = () => {
             });
             verForm.resetFields();
         } catch (e) {
+            console.error(e);
         }
     };
 
@@ -99,7 +103,7 @@ const useCompanyTab = () => {
         isLoading: isDictLoading || isFetching,
         isSaving,
         handleSave,
-        dictionaries: industries.map((i) => ({ value: i.id, label: i.title })),
+        dictionaries,
         verificationStatus,
         submitVerification,
         companyTitle: companyData?.title,

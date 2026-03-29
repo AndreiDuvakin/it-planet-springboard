@@ -1,48 +1,51 @@
 import React from 'react';
-import { Table, Select, Tag, Space, Typography } from 'antd';
+import { Table, Select, Tag, Typography, Card } from 'antd';
 import useUsersTab from './useUsersTab';
+import { ROLES_MAP } from '../../../../../../../Core/constants.js';
 
 const { Text } = Typography;
 
-function UsersTab({ data, onRefresh }) {
-    const { handleStatus, loading } = useUsersTab(onRefresh);
+function UsersTab() {
+    const { usersData, handleStatus, actionLoading, isLoading } = useUsersTab();
 
     const columns = [
         {
             title: 'Роль',
-            dataIndex: 'role',
+            dataIndex: ['role', 'title'],
             key: 'role',
-            render: (role) => {
-                let color = role === 'Работодатель' ? 'orange' : 'cyan';
-                return <Tag color={color}>{role.toUpperCase()}</Tag>;
-            }
-        },
-        {
-            title: 'Пользователь',
-            dataIndex: 'name',
-            key: 'name',
-            render: (name, record) => (
-                <Space direction="vertical" size={0}>
-                    <Text strong>{name}</Text>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>{record.email}</Text>
-                </Space>
+            width: 150,
+            render: (title) => (
+                <Tag color={title === 'employer' ? 'orange' : 'cyan'}>
+                    {(ROLES_MAP[title] || title).toUpperCase()}
+                </Tag>
             )
         },
         {
-            title: 'Статус аккаунта',
-            dataIndex: 'status',
+            title: 'Пользователь',
+            key: 'user',
+            render: (_, record) => (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Text strong>
+                        {`${record.last_name || ''} ${record.first_name || ''}`.trim() || 'Пользователь'}
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>{record.email}</Text>
+                </div>
+            )
+        },
+        {
+            title: 'Статус',
+            dataIndex: 'is_activated',
             key: 'status',
-            width: 220,
-            render: (status, record) => (
+            width: 180,
+            render: (is_activated, record) => (
                 <Select
-                    value={status}
+                    value={is_activated ? 'active' : 'blocked'}
                     style={{ width: '100%' }}
-                    loading={loading}
-                    onChange={(val) => handleStatus(record.id, val)}
+                    loading={actionLoading}
+                    onChange={(val) => handleStatus(record.id, val === 'active')}
                     options={[
                         { value: 'active', label: 'Активен' },
                         { value: 'blocked', label: 'Заблокирован' },
-                        { value: 'pending', label: 'Ожидает верификацию' },
                     ]}
                 />
             )
@@ -50,12 +53,16 @@ function UsersTab({ data, onRefresh }) {
     ];
 
     return (
-        <Table
-            columns={columns}
-            dataSource={data}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-        />
+        <Card style={{ borderRadius: 14, marginTop: 16 }}>
+            <Table
+                columns={columns}
+                dataSource={usersData}
+                loading={isLoading}
+                rowKey="id"
+                pagination={{ pageSize: 10 }}
+                size="small"
+            />
+        </Card>
     );
 }
 

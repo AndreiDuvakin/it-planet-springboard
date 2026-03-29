@@ -1,28 +1,34 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { notification } from 'antd';
-import { useUpdateUserMutation } from '../../../../../../../Api/usersApi.js';
+import { useActivateUserMutation, useGetAllUsersQuery } from '../../../../../../../Api/usersApi.js';
 
-const useUsersTab = (onRefresh) => {
+const useUsersTab = () => {
     const [actionLoading, setActionLoading] = useState(false);
-    const [updateUser] = useUpdateUserMutation();
+    const [activateUser] = useActivateUserMutation();
 
-    const handleStatus = async (userId, statusData) => {
+    const { data: usersData = [], refetch, isLoading } = useGetAllUsersQuery(undefined, {
+        pollingInterval: 30000,
+    });
+
+    const handleStatus = async (userId, isActivated) => {
         setActionLoading(true);
         try {
-            await updateUser({ userId, ...statusData }).unwrap();
-            notification.success({
-                message: 'Статус пользователя обновлен',
-            });
-            if (onRefresh) onRefresh();
+            await activateUser({ user_id: userId, is_activated: isActivated }).unwrap();
+            notification.success({ message: 'Статус обновлен' });
+            refetch();
         } catch (error) {
-            const msg = error?.data?.detail || 'Ошибка при обновлении статуса';
-            notification.error({ message: msg });
+            notification.error({ message: error?.data?.detail || 'Ошибка обновления' });
         } finally {
             setActionLoading(false);
         }
     };
 
-    return { actionLoading, handleStatus };
+    return { 
+        handleStatus, 
+        actionLoading, 
+        usersData,
+        isLoading 
+    };
 };
 
 export default useUsersTab;
