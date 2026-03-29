@@ -235,7 +235,6 @@ npm run dev
 **VITE_BASE_URL** жёстко зашиты в образ на этапе сборки:
 ```Dockerfile
 ENV VITE_BASE_URL=https://api.springboard.numerum.team/api/v1
-ENV VITE_ROOT_ROLE_NAME=root
 ```
 Поэтому запуск предельно прост:
 ```bash
