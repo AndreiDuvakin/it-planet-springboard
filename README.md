@@ -274,10 +274,6 @@ https://springboard.numerum.team
 
 Видео ДЕМОНСТРАЦИИ проекта достпуно по ссылке: https://vkvideo.ru/video-237166148_456239017
 
-Или прямо тут:
-
-<iframe src="https://vkvideo.ru/video_ext.php?oid=-237166148&id=456239017&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>
-
 Пожалуйста, досмотрите видео целиком.
 
 ## Регистрация
