@@ -6,7 +6,6 @@ import AccountTab from './Components/AccountTab/AccountTab';
 import ModerationTab from './Components/ModerationTab/ModerationTab';
 import UsersTab from './Components/UsersTab/UsersTab';
 import VerificationTab from './Components/VerificationTab/VerificationTab';
-import CuratorsTab from './Components/CuratorsTab/CuratorsTab';
 
 const {Title} = Typography;
 const {Content} = Layout;
@@ -44,14 +43,6 @@ function CuratorCabinetPage() {
             children: <VerificationTab data={verificationQueue} onRefresh={refresh}/>
         },
     ];
-
-    if (isAdmin) {
-        items.push({
-            key: 'curators',
-            label: 'Кураторы (админ)',
-            children: <CuratorsTab/>
-        });
-    }
 
     return (
         <Layout style={{minHeight: '100vh', padding: '24px'}}>

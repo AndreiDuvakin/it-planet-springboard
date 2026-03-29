@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: andreiduvakin/springboard-api
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8000
+
+resources:
+  limits:
+    memory: 128Mi
+    cpu: 200m
+
+persistence:
+  path: /mnt/k8s_storage/springboard-api
+  uploads:
+    enabled: true
+    size: 7Gi
+    containerPath: /app/uploads
+
+ingress:
+  secretTLSName: springboard-api-tls-secret
+
+  domain: api.springboard.numerum.team
+
+  path: /
+  pathType: Prefix
+
+env:
+  DB_DRIVER: postgresql+asyncpg
+  DB_HOST: db.numerum.team
+  DB_PORT: 30000
+  DB_USER: springboard
+  DB_NAME: springboard
+  DB_SCHEMA: public
