@@ -329,4 +329,4 @@ dist-ssr
 *.sln
 *.sw?
 package-lock.json
-
+secrets.yaml
