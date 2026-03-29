@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
 def get_db_url() -> str:
     settings = Settings()
-    return f'{settings.db_driver}://{settings.db_user}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}?ssl=require'
+    return f'{settings.db_driver}://{settings.db_user}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}'
 
 
 def get_auth_data() -> dict:

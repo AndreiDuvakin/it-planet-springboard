@@ -111,7 +111,7 @@ class RegisterService:
         if not self.is_strong_password(register_user_entity.repeat_password):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail='Пароль слишком слабый. Пароль должен содержать не менее 8 символов, включая хотя бы одну букву и одну цифру и один специальный символ.'
+                detail='Пароль слишком слабый. Пароль должен содержать не менее 8 символов, включая хотя бы одну букву и одну цифру и один специальный символ из: !@#$%^&*(),.?\\\':{}|<>'
             )
 
         role = await self.roles_repository.get_by_id(register_user_entity.role_id)

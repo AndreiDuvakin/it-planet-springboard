@@ -42,8 +42,17 @@ export default function useRegister() {
         };
 
         try {
-            await createUser(payload);
+            const resp = await createUser(payload);
 
+            console.log(resp);
+            if (resp?.status !== 200) {
+                notification.error({
+                    title: "Ошибка",
+                    description: resp?.error?.data?.detail || "Пользователь не создан",
+                    duration: 30000
+                })
+                return;
+            }
             notification.success({
                 title: "Успешно",
                 description: "Пользователь успешно создан",
