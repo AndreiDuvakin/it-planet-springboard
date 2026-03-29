@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Select, DatePicker, Row, Col, Skeleton, Alert, Switch } from 'antd';
 import useInternshipFields from './useInternshipFields';
 
-const InternshipFields = () => {
+const InternshipFields = ({ allTags, setAllTags }) => {
     const { dictionaries, isLoading, isError } = useInternshipFields();
 
     if (isLoading) return <Skeleton active />;
@@ -52,6 +52,17 @@ const InternshipFields = () => {
                     </Form.Item>
                 </Col>
             </Row>
+
+            <Form.Item label="Теги (навыки, технологии)" name="local_tags">
+                <Select
+                    mode="multiple"
+                    placeholder="Выберите или добавьте теги"
+                    options={allTags.map(t => ({ value: t.title, label: t.title }))}
+                    filterOption={(input, opt) =>
+                        (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    allowClear
+                />
+            </Form.Item>
         </>
     );
 };

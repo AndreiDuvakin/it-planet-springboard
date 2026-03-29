@@ -9,7 +9,7 @@ export default function PrivacyTab() {
   return (
     <Card title="Приватность и нетворкинг" variant="outlined" style={{ borderRadius: 14 }}>
       <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
-        Кто видит ваш профиль и отклики среди других соискателей (локально в прототипе).
+        Кто видит ваш профиль и отклики среди других соискателей
       </Text>
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item

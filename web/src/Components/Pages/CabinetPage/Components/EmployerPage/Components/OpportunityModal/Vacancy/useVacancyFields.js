@@ -5,7 +5,6 @@ import {
 } from '../../../../../../../../Api/dictionariesApi.js';
 
 const useVacancyFields = () => {
-    // 3 отдельных вызова — в консоли (Network) будет 3 отдельных запроса
     const empRes = useGetEmploymentTypesQuery();
     const expRes = useGetExperienceLevelsQuery();
     const workRes = useGetWorkFormatsQuery();
@@ -28,11 +27,7 @@ const useVacancyFields = () => {
     const isLoading = empRes.isLoading || expRes.isLoading || workRes.isLoading;
     const isError = empRes.isError || expRes.isError || workRes.isError;
 
-    return {
-        dictionaries,
-        isLoading,
-        isError
-    };
+    return { dictionaries, isLoading, isError };
 };
 
 export default useVacancyFields;

@@ -1,24 +1,28 @@
 import { useState } from 'react';
 import { notification } from 'antd';
+import { useUpdateUserMutation } from '../../../../../../../Api/usersApi.js';
 
-const useUsersTab = () => {
+const useUsersTab = (onRefresh) => {
     const [actionLoading, setActionLoading] = useState(false);
+    const [updateUser] = useUpdateUserMutation();
 
-    const handleUserStatus = async (userId, newStatus) => {
+    const handleStatus = async (userId, statusData) => {
         setActionLoading(true);
         try {
+            await updateUser({ userId, ...statusData }).unwrap();
             notification.success({
-                message: 'Статус обновлен',
-                description: `Пользователь теперь: ${newStatus}`
+                message: 'Статус пользователя обновлен',
             });
+            if (onRefresh) onRefresh();
         } catch (error) {
-            notification.error({ message: 'Ошибка управления пользователем' });
+            const msg = error?.data?.detail || 'Ошибка при обновлении статуса';
+            notification.error({ message: msg });
         } finally {
             setActionLoading(false);
         }
     };
 
-    return { actionLoading, handleUserStatus };
+    return { actionLoading, handleStatus };
 };
 
 export default useUsersTab;

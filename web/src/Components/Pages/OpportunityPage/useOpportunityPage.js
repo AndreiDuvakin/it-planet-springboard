@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom' // <-- Добавлен useParams
 import { useSelector } from 'react-redux'
 import { getOpportunityById, addApplication } from '../../../local/tramplinStore.js'
 import { buildYandexMapsEmbedQuery } from '../HomePage/useHomePage.js'
@@ -25,19 +25,24 @@ export function useOpportunityPage() {
     [opportunity]
   )
 
-  const canApply =
-    !!userData &&
-    userData?.role?.title === 'applicant' &&
-    opportunity?.moderationStatus !== 'rejected'
+  const canApply = useMemo(() => {
+    if (!userData || !opportunity) return false
+    const role = userData?.role?.title || userData?.role
+    return role === 'applicant' && opportunity?.moderationStatus !== 'rejected'
+  }, [userData, opportunity])
 
   const onApply = useCallback(
     (coverLetter) => {
       if (!userData?.id || !opportunity) return
+      
       addApplication({
         applicantUserId: userData.id,
+        applicantName: userData.fio || userData.name || userData.email,
+        applicantEmail: userData.email,
         opportunityId: String(opportunity.id),
         opportunityTitle: opportunity.title,
         company: opportunity.company,
+        ownerUserId: opportunity.ownerUserId,
         coverLetter,
       })
     },

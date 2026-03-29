@@ -1,7 +1,3 @@
-/**
- * Локальный слой данных (localStorage) для прототипа без доработки API:
- * возможности, отклики, верификация работодателей, контакты, рекомендации, приватность, теги.
- */
 import { OPPORTUNITIES as MOCK_OPPS, TAGS as MOCK_TAG_TITLES } from '../mock/opportunities.js'
 
 const K = {
@@ -14,6 +10,16 @@ const K = {
   NETWORK_CONTACTS: 'tramplin_contacts_v1',
   NETWORK_RECS: 'tramplin_recommendations_v1',
   PRIVACY: 'tramplin_privacy_v1',
+}
+
+function get(key, fallback) {
+  const raw = localStorage.getItem(key)
+  return safeParse(raw, fallback)
+}
+
+function set(key, value) {
+  localStorage.setItem(key, JSON.stringify(value))
+  bumpStore()
 }
 
 function safeParse(json, fallback) {
@@ -32,15 +38,13 @@ export function bumpStore() {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('tramplin-store-changed'))
 }
 
-/** Стартовый реестр тегов (строки) — расширяется в UI */
 export function getTagRegistry() {
-  const raw = localStorage.getItem(K.TAGS)
-  const parsed = safeParse(raw, null)
+  const parsed = get(K.TAGS, null)
   if (parsed && Array.isArray(parsed) && parsed.length) {
     return parsed.map((t) => (typeof t === 'string' ? { id: t, title: t } : t))
   }
   const initial = MOCK_TAG_TITLES.map((t) => ({ id: t, title: t }))
-  localStorage.setItem(K.TAGS, JSON.stringify(initial))
+  set(K.TAGS, initial)
   return initial
 }
 
@@ -50,28 +54,23 @@ export function addTagTitle(title) {
   const reg = getTagRegistry()
   if (reg.some((x) => x.title.toLowerCase() === t.toLowerCase())) return reg
   const next = [...reg, { id: t, title: t }]
-  localStorage.setItem(K.TAGS, JSON.stringify(next))
-  bumpStore()
+  set(K.TAGS, next)
   return next
 }
 
-function loadPatches() {
-  return safeParse(localStorage.getItem(K.PATCHES), {})
+export function addTag(tag) {
+  const tags = getTagRegistry()
+  if (tags.find(t => t.id === tag.id || t.title === tag.title)) return tags
+  const next = [...tags, tag]
+  set(K.TAGS, next)
+  return next
 }
 
-function savePatches(p) {
-  localStorage.setItem(K.PATCHES, JSON.stringify(p))
-  bumpStore()
-}
 
-function loadExtras() {
-  return safeParse(localStorage.getItem(K.EXTRAS), [])
-}
-
-function saveExtras(list) {
-  localStorage.setItem(K.EXTRAS, JSON.stringify(list))
-  bumpStore()
-}
+function loadPatches() { return get(K.PATCHES, {}) }
+function savePatches(p) { set(K.PATCHES, p) }
+function loadExtras() { return get(K.EXTRAS, []) }
+function saveExtras(list) { set(K.EXTRAS, list) }
 
 function normalizeOpp(o) {
   return {
@@ -83,7 +82,6 @@ function normalizeOpp(o) {
   }
 }
 
-/** Все возможности для главной / карты / карточки */
 export function getOpportunities() {
   const patches = loadPatches()
   const extras = loadExtras().map(normalizeOpp)
@@ -124,39 +122,23 @@ export function upsertExtraOpportunity(opp) {
   return row
 }
 
-/** Записать возможность после успешного POST вакансии/стажировки + локальные теги */
-export function recordServerOpportunity({
-  serverId,
-  kind,
-  ownerUserId,
-  companyTitle,
-  localTags = [],
-  moderationStatus = 'pending',
-  extra = {},
-}) {
+export function recordServerOpportunity({ serverId, kind, ownerUserId, companyTitle, localTags = [], moderationStatus = 'pending', extra = {} }) {
   const id = String(serverId)
   return upsertExtraOpportunity({
-    id,
-    serverId,
+    id, serverId,
     title: extra.title || 'Без названия',
     company: companyTitle || 'Компания',
     type: kind === 'internship' ? 'internship' : 'vacancy',
-    kind,
-    format: extra.format || 'office',
-    city: extra.city || '',
-    address: extra.address || '',
-    salaryFrom: extra.salaryFrom ?? null,
-    salaryTo: extra.salaryTo ?? null,
+    kind, format: extra.format || 'office',
+    city: extra.city || '', address: extra.address || '',
+    salaryFrom: extra.salaryFrom ?? null, salaryTo: extra.salaryTo ?? null,
     publishedAt: extra.publishedAt || new Date().toISOString().slice(0, 10),
     expiresAt: extra.expiresAt || null,
-    tags: localTags,
-    description: extra.description || '',
+    tags: localTags, description: extra.description || '',
     contacts: extra.contacts || {},
     location: extra.location || { lat: 55.75, lng: 37.61 },
     status: extra.status || 'active',
-    ownerUserId,
-    source: 'api',
-    moderationStatus,
+    ownerUserId, source: 'api', moderationStatus,
     employmentType: extra.employmentType || 'full',
     experienceLevel: extra.experienceLevel || 'junior',
   })
@@ -167,19 +149,24 @@ export function getEmployerOpportunities(userId) {
   return getOpportunities().filter((o) => o.ownerUserId === userId)
 }
 
-// --- Отклики ---
-
-function loadApplications() {
-  return safeParse(localStorage.getItem(K.APPLICATIONS), [])
+export function deleteOpportunity(id) {
+  const sid = String(id)
+  saveExtras(loadExtras().filter((o) => String(o.id) !== sid))
 }
 
-function saveApplications(list) {
-  localStorage.setItem(K.APPLICATIONS, JSON.stringify(list))
-  bumpStore()
+export function getModerationQueue() {
+  return getOpportunities().filter((o) => o.moderationStatus === 'pending')
 }
+
+function loadApplications() { return get(K.APPLICATIONS, []) }
+function saveApplications(list) { set(K.APPLICATIONS, list) }
 
 export function getApplicationsForApplicant(userId) {
   return loadApplications().filter((a) => a.applicantUserId === userId)
+}
+
+export function getApplicationsByApplicant(userId) {
+  return getApplicationsForApplicant(userId)
 }
 
 export function getApplicationsForEmployer(companyName) {
@@ -188,17 +175,32 @@ export function getApplicationsForEmployer(companyName) {
   return loadApplications().filter((a) => (a.company || '').trim().toLowerCase() === cn)
 }
 
-export function addApplication({
-  applicantUserId,
-  opportunityId,
-  opportunityTitle,
-  company,
-  coverLetter,
+export function getApplicationsByOpportunity(opportunityId) {
+  return loadApplications().filter((a) => String(a.opportunityId) === String(opportunityId))
+}
+
+export function getApplications() {
+  return loadApplications()
+}
+
+
+export function addApplication({ 
+  applicantUserId, 
+  opportunityId, 
+  opportunityTitle, 
+  company, 
+  coverLetter, 
+  applicantName, 
+  applicantEmail,
+  ownerUserId 
 }) {
   const list = loadApplications()
   const row = {
     id: uid('app'),
     applicantUserId,
+    ownerUserId: ownerUserId || null, 
+    applicantName: applicantName || '',
+    applicantEmail: applicantEmail || '',
     opportunityId: String(opportunityId),
     opportunityTitle,
     company,
@@ -206,6 +208,7 @@ export function addApplication({
     status: 'Новый',
     note: '',
     date: new Date().toISOString().slice(0, 10),
+    createdAt: new Date().toISOString(),
   }
   list.push(row)
   saveApplications(list)
@@ -221,81 +224,86 @@ export function updateApplication(id, partial) {
   return list[ix]
 }
 
+export function patchApplication(id, partial) {
+  return updateApplication(id, partial)
+}
+
 export function removeApplication(id) {
   const list = loadApplications().filter((a) => a.id !== id)
   saveApplications(list)
 }
 
-// --- Верификация работодателя ---
 
-export function getVerificationQueue() {
-  return safeParse(localStorage.getItem(K.VERIFICATIONS), [])
-}
-
-function saveVerifications(list) {
-  localStorage.setItem(K.VERIFICATIONS, JSON.stringify(list))
-  bumpStore()
-}
-
-export function submitEmployerVerification({ userId, company, inn, corporateEmail, links }) {
-  const list = getVerificationQueue()
-  const row = {
-    id: uid('ver'),
-    userId,
-    company,
-    inn,
-    corporateEmail,
-    links: links || '',
-    status: 'pending',
-    createdAt: new Date().toISOString(),
-  }
-  list.push(row)
-  saveVerifications(list)
-  return row
-}
-
-export function setVerificationRequestStatus(id, status) {
-  const list = getVerificationQueue()
-  const ix = list.findIndex((v) => v.id === id)
-  if (ix < 0) return
-  const row = { ...list[ix], status }
-  list[ix] = row
-  saveVerifications(list)
-  if (row.userId != null) {
-    if (status === 'approved') setEmployerVerificationUserStatus(row.userId, 'approved')
-    else if (status === 'rejected') setEmployerVerificationUserStatus(row.userId, 'rejected')
-  }
+export function getVerificationRequests() {
+  return get(K.VERIFICATIONS, [])
 }
 
 export function getEmployerVerificationStatus(userId) {
-  const map = safeParse(localStorage.getItem(K.EMPLOYER_STATUS), {})
-  return map[userId] || 'none'
+  if (!userId) return 'none'
+
+  const requests = getVerificationRequests()
+  const userReq = requests
+    .filter((r) => String(r.userId) === String(userId))
+    .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))[0]
+
+  if (userReq && userReq.status !== 'approved') return userReq.status
+
+  const manualMap = get(K.EMPLOYER_STATUS, {})
+  return manualMap[String(userId)] || 'none'
+}
+
+export function submitEmployerVerification(data) {
+  const list = getVerificationRequests()
+  const req = {
+    ...data,
+    id: uid('ver'),
+    status: 'pending',
+    submittedAt: new Date().toISOString(),
+  }
+  set(K.VERIFICATIONS, [...list, req])
+  return req
 }
 
 export function setEmployerVerificationUserStatus(userId, status) {
-  const map = safeParse(localStorage.getItem(K.EMPLOYER_STATUS), {})
-  map[userId] = status
-  localStorage.setItem(K.EMPLOYER_STATUS, JSON.stringify(map))
-  bumpStore()
+  const map = get(K.EMPLOYER_STATUS, {})
+  map[String(userId)] = status
+  set(K.EMPLOYER_STATUS, map)
+
+  const requests = getVerificationRequests().map((r) =>
+    String(r.userId) === String(userId) ? { ...r, status } : r
+  )
+  set(K.VERIFICATIONS, requests)
 }
 
-// --- Контакты / рекомендации ---
-
-function loadContacts() {
-  return safeParse(localStorage.getItem(K.NETWORK_CONTACTS), [])
+export function setVerificationRequestStatus(id, status) {
+  const list = getVerificationRequests().map((r) => {
+    if (String(r.id) === String(id)) {
+      setEmployerVerificationUserStatus(r.userId, status)
+      return { ...r, status }
+    }
+    return r
+  })
+  set(K.VERIFICATIONS, list)
 }
 
-function saveContacts(list) {
-  localStorage.setItem(K.NETWORK_CONTACTS, JSON.stringify(list))
-  bumpStore()
+export function getVerificationQueue() {
+  return getVerificationRequests().filter((r) => r.status === 'pending')
 }
+
+function loadContacts() { return get(K.NETWORK_CONTACTS, []) }
+function saveContacts(list) { set(K.NETWORK_CONTACTS, list) }
 
 export function getContactsForUser(userId) {
   return loadContacts().filter((c) => c.ownerUserId === userId)
 }
 
+export function getContacts(userId) {
+  return getContactsForUser(userId)
+}
+
 export function addContact(ownerUserId, contact) {
   const list = loadContacts()
+  if (list.find((c) => c.ownerUserId === ownerUserId && c.userId === contact.userId)) return list
   list.push({
     id: uid('c'),
     ownerUserId,
@@ -305,6 +313,7 @@ export function addContact(ownerUserId, contact) {
     skills: contact.skills || [],
   })
   saveContacts(list)
+  return list
 }
 
 export function removeContact(contactId) {
@@ -312,20 +321,23 @@ export function removeContact(contactId) {
   saveContacts(list)
 }
 
-function loadRecs() {
-  return safeParse(localStorage.getItem(K.NETWORK_RECS), [])
+export function removeContactById(userId, contactId) {
+  removeContact(contactId)
 }
 
-function saveRecs(list) {
-  localStorage.setItem(K.NETWORK_RECS, JSON.stringify(list))
-  bumpStore()
-}
+
+function loadRecs() { return get(K.NETWORK_RECS, []) }
+function saveRecs(list) { set(K.NETWORK_RECS, list) }
 
 export function getRecommendationsForUser(userId) {
   return loadRecs().filter((r) => r.toUserId === userId && r.state !== 'declined')
 }
 
-export function addRecommendation({ fromUserId, toUserId, opportunityTitle, fromName }) {
+export function getRecommendations(userId) {
+  return loadRecs().filter((r) => r.toUserId === userId)
+}
+
+export function addRecommendation({ fromUserId, toUserId, opportunityTitle, opportunityId, fromName, message }) {
   const list = loadRecs()
   list.push({
     id: uid('rec'),
@@ -333,8 +345,12 @@ export function addRecommendation({ fromUserId, toUserId, opportunityTitle, from
     toUserId,
     fromName: fromName || 'Коллега',
     opportunityTitle,
+    opportunityId: opportunityId || null,
+    message: message || '',
     date: new Date().toISOString().slice(0, 10),
+    createdAt: new Date().toISOString(),
     state: 'pending',
+    read: false,
   })
   saveRecs(list)
 }
@@ -347,26 +363,31 @@ export function setRecommendationState(id, state) {
   saveRecs(list)
 }
 
-// --- Приватность ---
+export function markRecommendationRead(userId, recId) {
+  const list = loadRecs()
+  const ix = list.findIndex((r) => r.id === recId && r.toUserId === userId)
+  if (ix < 0) return
+  list[ix] = { ...list[ix], read: true }
+  saveRecs(list)
+}
 
 export function getPrivacy(userId) {
-  const all = safeParse(localStorage.getItem(K.PRIVACY), {})
-  return (
-    all[userId] || {
-      profileVisibility: 'contacts',
-      hideApplications: false,
-    }
-  )
+  const all = get(K.PRIVACY, {})
+  return all[userId] || {
+    profileVisibility: 'contacts',
+    hideApplications: false,
+    openProfile: false,
+    showResume: false,
+    showApplications: false,
+  }
 }
 
 export function setPrivacy(userId, partial) {
-  const all = safeParse(localStorage.getItem(K.PRIVACY), {})
+  const all = get(K.PRIVACY, {})
   all[userId] = { ...getPrivacy(userId), ...partial }
-  localStorage.setItem(K.PRIVACY, JSON.stringify(all))
-  bumpStore()
+  set(K.PRIVACY, all)
 }
 
-/** Очередь модерации для куратора */
-export function getModerationQueue() {
-  return getOpportunities().filter((o) => o.moderationStatus === 'pending')
+export function getApplicationsByOwnerId(userId) {
+  return loadApplications().filter((a) => String(a.ownerUserId) === String(userId))
 }

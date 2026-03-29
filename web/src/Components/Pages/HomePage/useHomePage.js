@@ -22,7 +22,6 @@ export const EXPERIENCE_LEVELS = [
 
 export const TYPE_COLORS = {
   vacancy: 'blue',
-  vacancy_junior: 'geekblue',
   internship: 'cyan',
   mentor: 'purple',
   mentorship: 'purple',

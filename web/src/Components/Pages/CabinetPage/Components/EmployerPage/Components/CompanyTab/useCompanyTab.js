@@ -6,7 +6,6 @@ import { useGetAllIndustriesQuery } from "../../../../../../../Api/industriesApi
 import {
     submitEmployerVerification,
     getEmployerVerificationStatus,
-    setEmployerVerificationUserStatus,
 } from "../../../../../../../local/tramplinStore.js";
 
 const useCompanyTab = () => {
@@ -29,11 +28,9 @@ const useCompanyTab = () => {
                 video_url: companyData.video_url,
                 socials: companyData.socials || [],
 
-                // Сохраняем ID для отправки
                 logo_id: companyData.logo?.id,
                 official_photo_id: companyData.official_photo?.id,
 
-                // Формируем fileList для отображения превью в компоненте Upload
                 logo_file: companyData.logo ? [{
                     uid: '-1',
                     name: companyData.logo.filename,
@@ -93,14 +90,7 @@ const useCompanyTab = () => {
             });
             verForm.resetFields();
         } catch (e) {
-            /* validation */
         }
-    };
-
-    const markVerifiedDemo = () => {
-        if (userData?.id == null) return;
-        setEmployerVerificationUserStatus(userData.id, 'approved');
-        notification.info({ message: 'Локально отмечено как верифицированная (для демо API)' });
     };
 
     return {
@@ -112,7 +102,6 @@ const useCompanyTab = () => {
         dictionaries: industries.map((i) => ({ value: i.id, label: i.title })),
         verificationStatus,
         submitVerification,
-        markVerifiedDemo,
         companyTitle: companyData?.title,
     };
 };

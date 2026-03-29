@@ -60,10 +60,12 @@ export default function OpportunityPage() {
       notification.info({ message: 'Войдите как соискатель, чтобы откликнуться' })
       return
     }
+    
     onApply(values.coverLetter)
+    
     notification.success({
       message: 'Отклик отправлен',
-      description: 'Статус можно отследить в личном кабинете.',
+      description: 'Работодатель увидит ваше сообщение. Статус можно отследить в ЛК.',
     })
     form.resetFields()
   }
@@ -129,8 +131,9 @@ export default function OpportunityPage() {
             </div>
           </Card>
 
+
           <Card title="Контакты и ссылки" variant="outlined" style={{ borderRadius: 14, marginTop: 16 }}>
-            <Space orientation="vertical" size={8}>
+            <Space direction="vertical" size={8} style={{ width: '100%' }}>
               {opportunity.contacts?.site && (
                 <a href={opportunity.contacts.site} target="_blank" rel="noreferrer">
                   <LinkOutlined /> Сайт
@@ -142,6 +145,7 @@ export default function OpportunityPage() {
                 </Text>
               )}
               {opportunity.contacts?.telegram && <Text>Telegram: {opportunity.contacts.telegram}</Text>}
+              {!opportunity.contacts?.site && !opportunity.contacts?.email && <Text type="secondary">Контакты не указаны</Text>}
             </Space>
           </Card>
 
@@ -184,7 +188,7 @@ export default function OpportunityPage() {
               <iframe title="Yandex map" src={mapSrc} width="100%" height="320" style={{ border: 'none' }} />
             </div>
             <Text type="secondary" style={{ display: 'block', marginTop: 8, fontSize: 12 }}>
-              Для офлайн-адреса показывается поиск по адресу; для удалённых — по городу работодателя (ТЗ).
+              Для офлайн-адреса показывается поиск по адресу; для удалённых — по городу работодателя.
             </Text>
           </Card>
         </Col>

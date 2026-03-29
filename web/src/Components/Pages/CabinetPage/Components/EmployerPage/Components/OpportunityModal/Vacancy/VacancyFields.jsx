@@ -2,18 +2,12 @@ import React from 'react';
 import { Form, Input, Select, DatePicker, Row, Col, Skeleton, Alert } from 'antd';
 import useVacancyFields from './useVacancyFields';
 
-const VacancyFields = () => {
+const VacancyFields = ({ allTags, setAllTags }) => {
     const { dictionaries, isLoading, isError } = useVacancyFields();
 
     if (isLoading) return <Skeleton active paragraph={{ rows: 4 }} />;
-
     if (isError) return (
-        <Alert
-            message="Ошибка загрузки"
-            description="Не удалось загрузить списки справочников."
-            type="error"
-            showIcon
-        />
+        <Alert message="Ошибка загрузки" description="Не удалось загрузить справочники." type="error" showIcon />
     );
 
     return (
@@ -50,11 +44,7 @@ const VacancyFields = () => {
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item
-                        label="Адрес / город"
-                        name="address"
-                        rules={[{ required: true, message: 'Введите адрес' }]}
-                    >
+                    <Form.Item label="Адрес / город" name="address" rules={[{ required: true }]}>
                         <Input placeholder="Москва, ул. ..." />
                     </Form.Item>
                 </Col>
@@ -75,6 +65,17 @@ const VacancyFields = () => {
 
             <Form.Item label="Срок действия вакансии" name="expires_at">
                 <DatePicker style={{ width: '100%' }} placeholder="Выберите дату завершения" />
+            </Form.Item>
+
+            <Form.Item label="Теги (навыки, технологии)" name="local_tags">
+                <Select
+                    mode="multiple"
+                    placeholder="Выберите или добавьте теги"
+                    options={allTags.map(t => ({ value: t.title, label: t.title }))}
+                    filterOption={(input, opt) =>
+                        (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    allowClear
+                />
             </Form.Item>
         </>
     );

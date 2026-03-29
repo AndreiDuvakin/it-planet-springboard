@@ -1,33 +1,17 @@
-import { useState, useEffect } from 'react';
+const EVENT_TYPES = [
+    { value: 'hackathon', label: 'Хакатон' },
+    { value: 'meetup', label: 'Митап' },
+    { value: 'conference', label: 'Конференция' },
+    { value: 'workshop', label: 'Воркшоп' },
+    { value: 'presentation', label: 'Презентация' },
+    { value: 'career_fair', label: 'Ярмарка вакансий' },
+];
 
-const useEventFields = (notification, onRefresh) => {
-    const [eventTypes, setEventTypes] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const fetchEventTypes = async () => {
-        setIsLoading(true);
-        try {
-            if (onRefresh) onRefresh();
-        } catch (e) {
-            if (notification) {
-                notification.error({
-                    message: 'Ошибка сервера',
-                    description: 'Не удалось загрузить типы мероприятий'
-                });
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchEventTypes();
-    }, []);
-
+const useEventFields = () => {
     return {
-        eventTypes,
-        isLoading,
-        refresh: fetchEventTypes
+        eventTypes: EVENT_TYPES,
+        isLoading: false,
+        refresh: () => {}
     };
 };
 

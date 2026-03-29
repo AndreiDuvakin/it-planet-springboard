@@ -1,8 +1,8 @@
 import React from 'react';
-import { Form, Input, Row, Col } from 'antd';
+import { Form, Input, Row, Col, Select } from 'antd';
 import useMentorshipFields from './useMentorshipFields';
 
-const MentorshipFields = () => {
+const MentorshipFields = ({ allTags, setAllTags }) => {
     const {} = useMentorshipFields();
 
     return (
@@ -19,11 +19,24 @@ const MentorshipFields = () => {
                     </Form.Item>
                 </Col>
             </Row>
+
+            <Form.Item label="Адрес / город" name="address">
+                <Input placeholder="Москва или Онлайн" />
+            </Form.Item>
+
             <Form.Item label="Критерии отбора" name="selection_criteria">
                 <Input.TextArea rows={2} placeholder="Требования к кандидату..." />
             </Form.Item>
-            <Form.Item label="Адрес / город" name="address">
-                <Input placeholder="Москва или Онлайн" />
+
+            <Form.Item label="Теги (навыки, технологии)" name="local_tags">
+                <Select
+                    mode="multiple"
+                    placeholder="Выберите или добавьте теги"
+                    options={allTags.map(t => ({ value: t.title, label: t.title }))}
+                    filterOption={(input, opt) =>
+                        (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    allowClear
+                />
             </Form.Item>
         </>
     );

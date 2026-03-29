@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Select, DatePicker, Row, Col, Switch } from 'antd';
 import useEventFields from './useEventFields';
 
-const EventFields = () => {
+const EventFields = ({ allTags, setAllTags }) => {
     const { eventTypes } = useEventFields();
 
     return (
@@ -19,6 +19,7 @@ const EventFields = () => {
                     </Form.Item>
                 </Col>
             </Row>
+
             <Row gutter={12}>
                 <Col span={12}>
                     <Form.Item label="Адрес / город" name="address" rules={[{ required: true }]}>
@@ -31,8 +32,20 @@ const EventFields = () => {
                     </Form.Item>
                 </Col>
             </Row>
+
             <Form.Item label="Онлайн-мероприятие" name="is_online" valuePropName="checked">
                 <Switch />
+            </Form.Item>
+
+            <Form.Item label="Теги (навыки, технологии)" name="local_tags">
+                <Select
+                    mode="multiple"
+                    placeholder="Выберите или добавьте теги"
+                    options={allTags.map(t => ({ value: t.title, label: t.title }))}
+                    filterOption={(input, opt) =>
+                        (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    allowClear
+                />
             </Form.Item>
         </>
     );
