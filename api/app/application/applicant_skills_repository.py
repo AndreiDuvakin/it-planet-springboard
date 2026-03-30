@@ -27,10 +27,17 @@ class ApplicantSkillsRepository:
         self.db.add_all(applicant_skills)
         await self.db.commit()
 
-        for applicant_skill in applicant_skills:
-            await self.db.refresh(applicant_skill)
+        ids = [skill.id for skill in applicant_skills]
 
-        return applicant_skills
+        query = (
+            select(ApplicantSkill)
+            .where(ApplicantSkill.id.in_(ids))
+            .options(joinedload(ApplicantSkill.tag))
+            .options(joinedload(ApplicantSkill.level))
+        )
+
+        result = await self.db.execute(query)
+        return result.scalars().all()
 
     async def delete_list(self, applicant_skills: List[ApplicantSkill] | Sequence[ApplicantSkill]) -> List[ApplicantSkill]:
         for applicant_skill in applicant_skills:

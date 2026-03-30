@@ -83,8 +83,6 @@ class ApplicantSkillsService:
                 level_id=applicant_skill.level_id,
                 tag_id=applicant_skill.tag_id,
                 applicant_id=applicant_id,
-                level=skill_level,
-                tag=applicant_skills_tag,
             ))
 
         applicant_skills_models = await self.applicant_skills_repository.create_list(applicant_skills_models)
