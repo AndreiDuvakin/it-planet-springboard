@@ -44,7 +44,7 @@ export default function useRegister() {
         try {
             const resp = await createUser(payload);
 
-            if (resp?.status !== 200 && resp?.error?.data?.detail) {
+            if (resp?.error?.data?.detail) {
                 notification.error({
                     title: "Ошибка",
                     description: resp?.error?.data?.detail || "Пользователь не создан",
